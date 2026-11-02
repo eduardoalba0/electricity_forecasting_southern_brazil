@@ -1,0 +1,13 @@
+State,Consumo,KPSS Stat,KPSS p-valor,KPSS Conclusão (alpha=0.05),MK Tau,MK Sen Slope,MK p-valor,MK Conclusão (alpha=0.05),KW Stat,KW p-valor,KW Conclusão (alpha=0.05)
+PR,Residential (MWh),2.3799,<= 0.01,No stationarity,0.8699,1676.98,0.00e+00,Crescent Trend,4.1715,0.9646,No seasonal
+PR,Industrial (MWh),2.4715,<= 0.01,No stationarity,0.8397,2012.07,0.00e+00,Crescent Trend,5.1207,0.9252,No seasonal
+PR,Commercial (MWh),2.3689,<= 0.01,No stationarity,0.7879,1417.04,0.00e+00,Crescent Trend,14.7889,0.1924,No seasonal
+PR,Other (MWh),2.5345,<= 0.01,No stationarity,0.8506,1207.25,0.00e+00,Crescent Trend,8.859,0.6349,No seasonal
+SC,Residential (MWh),2.4308,<= 0.01,No stationarity,0.8082,1444.02,0.00e+00,Crescent Trend,16.5189,0.1229,No seasonal
+SC,Industrial (MWh),2.4512,<= 0.01,No stationarity,0.8121,1772.75,0.00e+00,Crescent Trend,10.3009,0.5035,No seasonal
+SC,Commercial (MWh),2.4284,<= 0.01,No stationarity,0.7725,1162.41,0.00e+00,Crescent Trend,23.4523,0.0153,Seazonal
+SC,Other (MWh),2.3333,<= 0.01,No stationarity,0.6956,1084.98,0.00e+00,Crescent Trend,16.4591,0.1249,No seasonal
+RS,Residential (MWh),2.438,<= 0.01,No stationarity,0.7942,1789.47,0.00e+00,Crescent Trend,16.4373,0.1257,No seasonal
+RS,Industrial (MWh),1.0898,<= 0.01,No stationarity,0.2609,319.87,1.54e-10,Crescent Trend,73.4519,2.68e-11,Seazonal
+RS,Commercial (MWh),2.0165,<= 0.01,No stationarity,0.5225,707.49,0.00e+00,Crescent Trend,65.7117,7.92e-10,Seazonal
+RS,Other (MWh),1.7421,<= 0.01,No stationarity,0.3161,635.8,8.88e-15,Crescent Trend,144.6782,1.82e-25,Seazonal
