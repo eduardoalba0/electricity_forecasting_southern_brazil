@@ -3,8 +3,11 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
-class LSTM_Wrapper:
+
+class LSTMWrapper:
     def __init__(self,
+                 inputs,
+                 timesteps,
                  units,
                  epochs,
                  batch_size,
@@ -12,49 +15,63 @@ class LSTM_Wrapper:
                  output_activation='linear',
                  optimizer='adam',
                  loss='mse',
-                 early_stopping=5,
-                 validation_split=0.2):
-        self.units = units
-        self.epochs = epochs
-        self.batch_size = batch_size
-        self.lstm_activation = lstm_activation
-        self.output_activation = output_activation
-        self.optimizer = optimizer
-        self.loss = loss
-        self.early_stopping = early_stopping
-        self.validation_split = validation_split
-        self.model = None
+                 early_stopping=5):
 
+        self._inputs = inputs
+        self._units = units
+        self._epochs = epochs
+        self._batch_size = batch_size
+        self._timesteps = timesteps
+        self._lstm_activation = lstm_activation
+        self._output_activation = output_activation
+        self._optimizer = optimizer
+        self._loss = loss
+        self._early_stopping = early_stopping
+        self._model = None
+        self._build_model()
 
-    def fit(self, x, y):
-        x_3d = np.asarray(x).reshape((x.shape[0], x.shape[1], 1))
-
-        self.model = Sequential([
-            Input(shape=(x_3d.shape[1], 1)),
-            LSTM(self.units, activation=self.lstm_activation),
-            Dense(1, activation=self.output_activation)
+    def _build_model(self):
+        self._model = Sequential([
+            Input(shape=(self._timesteps, self._inputs)),
+            LSTM(self._units, activation=self._lstm_activation),
+            Dense(1, activation=self._output_activation)
         ])
-        self.model.compile(optimizer=self.optimizer, loss=self.loss)
+        self._model.compile(optimizer=self._optimizer, loss=self._loss)
+
+    def _apply_sliding_window(self, x):
+        x_seq = []
+        for i in range(len(x) - self._timesteps + 1):
+            x_seq.append(x[i: i + self._timesteps])
+        return np.array(x_seq)
+
+    def fit(self, x, y, validation_split=0.2):
+        x_2d = np.asarray(x)
+        y_arr = np.asarray(y)
+
+        x_3d = self._apply_sliding_window(x_2d)
+
+        y_adjusted = y_arr[self._timesteps - 1:]
 
         callbacks = []
-        if self.early_stopping > 0:
+        if self._early_stopping > 0 and validation_split > 0:
             callbacks.append(EarlyStopping(
-                monitor='val_loss', patience=self.early_stopping, restore_best_weights=True
+                monitor='val_loss', patience=self._early_stopping, restore_best_weights=True
             ))
 
-        self.model.fit(
-            x_3d, y, epochs=self.epochs, batch_size=self.batch_size,
-            validation_split=self.validation_split, callbacks=callbacks, verbose=0
+        self._model.fit(
+            x_3d, y_adjusted, epochs=self._epochs, validation_split=validation_split, batch_size=self._batch_size,
+            callbacks=callbacks, verbose=0
         )
         return self
 
     def predict(self, x):
-        x_3d = np.asarray(x).reshape((x.shape[0], x.shape[1], 1))
-        return self.model.predict(x_3d, verbose=0).flatten()
+        x_2d = np.asarray(x)
+        x_3d = self._apply_sliding_window(x_2d)
+        return self._model.predict(x_3d, verbose=0).flatten()
 
-
-class MLP_Wrapper:
+class MLPWrapper:
     def __init__(self,
+                 inputs,
                  hidden_layers,
                  epochs,
                  batch_size,
@@ -62,42 +79,43 @@ class MLP_Wrapper:
                  output_activation='linear',
                  optimizer='adam',
                  loss='mse',
-                 early_stopping=5,
-                 validation_split=0.2):
+                 early_stopping=5):
 
-        self.hidden_layers = hidden_layers
-        self.epochs = epochs
-        self.batch_size = batch_size
-        self.hidden_activation = hidden_activation
-        self.output_activation = output_activation
-        self.optimizer = optimizer
-        self.loss = loss
-        self.early_stopping = early_stopping
-        self.validation_split = validation_split
-        self.model = None
+        self._inputs = inputs
+        self._hidden_layers = hidden_layers
+        self._epochs = epochs
+        self._batch_size = batch_size
+        self._hidden_activation = hidden_activation
+        self._output_activation = output_activation
+        self._optimizer = optimizer
+        self._loss = loss
+        self._early_stopping = early_stopping
+        self._model = None
+        self._build_model()
 
-    def fit(self, x, y):
-        self.model = Sequential()
-        self.model.add(Input(shape=(x.shape[1],)))
+    def _build_model(self):
+        self._model = Sequential([
+            Input(shape=(self._inputs,)),
+            Dense(self._hidden_layers, activation=self._hidden_activation),
+            Dense(1, activation=self._output_activation)
+        ])
+        self._model.compile(optimizer=self._optimizer, loss=self._loss)
 
-        self.model.add(Dense(self.hidden_layers, activation=self.hidden_activation))
-
-        self.model.add(Dense(1, activation=self.output_activation))
-        self.model.compile(optimizer=self.optimizer, loss=self.loss)
+    def fit(self, x, y, validation_split=0.2):
+        x_2d = np.asarray(x)
 
         callbacks = []
-        if self.early_stopping > 0:
+        if self._early_stopping > 0 and validation_split > 0:
             callbacks.append(EarlyStopping(
-                monitor='val_loss', patience=self.early_stopping, restore_best_weights=True
+                monitor='val_loss', patience=self._early_stopping, restore_best_weights=True
             ))
 
-        self.model.fit(
-            x, y, epochs=self.epochs, batch_size=self.batch_size,
-            validation_split=self.validation_split, callbacks=callbacks, verbose=0
+        self._model.fit(
+            x_2d, y, epochs=self._epochs, validation_split=validation_split, batch_size=self._batch_size,
+            callbacks=callbacks, verbose=0
         )
         return self
 
     def predict(self, x):
-        return self.model.predict(x, verbose=0).flatten()
-
-
+        x_2d = np.asarray(x)
+        return self._model.predict(x_2d, verbose=0).flatten()
