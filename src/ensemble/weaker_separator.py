@@ -1,4 +1,3 @@
-import random
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
@@ -33,6 +32,7 @@ class WSBagging:
         self.early_stopping = early_stopping
 
         self.random_state = random_state
+        self.rng = np.random.default_rng(self.random_state)
         self.feature_index_ = []
 
     def fit(self, x, y, validation_split=0.2):
@@ -48,7 +48,6 @@ class WSBagging:
             x_val, y_val = None, None
 
         n_samples, n_features = x_train.shape
-        rng = np.random.default_rng(self.random_state)
         sample_size = max(1, int(n_samples * self.bootstrap_ratio))
         patch_size = max(1, int(n_features * self.patches_ratio))
 
@@ -69,13 +68,13 @@ class WSBagging:
 
         for i, predictor in enumerate(candidates):
             if self.bootstrap:
-                start = int(rng.integers(0, n_samples - sample_size + 1))
+                start = int(self.rng.integers(0, n_samples - sample_size + 1))
                 row_idx = np.arange(start, start + sample_size)
             else:
                 row_idx = np.arange(n_samples)
 
             if self.random_patches:
-                col_idx = rng.choice(n_features, size=patch_size, replace=False)
+                col_idx = self.rng.choice(n_features, size=patch_size, replace=False)
             else:
                 col_idx = np.arange(n_features)
 
@@ -199,6 +198,8 @@ class MLP(WSBagging):
 
     def build_model(self):
         activations = ["linear", "mish", "sigmoid", "softmax", "softplus", "softsign", "tanh", 'elu', 'selu']
+        self.weak_predictors = []
+
         self.strong_predictor = MLP_Wrapper(
                 hidden_layers=self.mlp_strong_hidden,
                 epochs=self.mlp_strong_epochs,
@@ -206,23 +207,15 @@ class MLP(WSBagging):
                 hidden_activation=self.mlp_strong_activation,
                 early_stopping=self.early_stopping
         )
-        self.weak_predictors = []
         for _ in range(self.n_weak_mlps):
             mlp = MLP_Wrapper(
-                hidden_layers=random.randint(1, self.max_mlp_hidden),
-                epochs=random.randint(1, self.max_mlp_epochs),
-                batch_size=random.randint(1, self.max_mlp_batch_size),
-                hidden_activation=random.choice(activations),
+                hidden_layers=int(self.rng.integers(1, self.max_mlp_hidden, endpoint=True)),
+                epochs=int(self.rng.integers(1, self.max_mlp_epochs, endpoint=True)),
+                batch_size=int(self.rng.integers(1, self.max_mlp_batch_size, endpoint=True)),
+                hidden_activation=self.rng.choice(activations),
                 early_stopping=self.early_stopping
             )
             self.weak_predictors.append(mlp)
-
-
-    def fit(self, x, y, validation_split=0.2):
-        return super().fit(x, y,validation_split=len(y))
-
-    def predict(self, x):
-        return super().predict(x)
 
 class LSTMMLP(WSBagging):
     def __init__(self,
@@ -268,6 +261,7 @@ class LSTMMLP(WSBagging):
 
     def build_model(self):
         activations = ["linear", "mish", "sigmoid", "softmax", "softplus", "softsign", "tanh", 'elu', 'selu']
+        self.weak_predictors = []
 
         self.strong_predictor = LSTM_Wrapper(
             units=self.lstm_units,
@@ -279,18 +273,10 @@ class LSTMMLP(WSBagging):
 
         for _ in range(self.n_weak_mlps):
             mlp = MLP_Wrapper(
-                hidden_layers=random.randint(1, self.max_mlp_hidden),
-                epochs=random.randint(1, self.max_mlp_epochs),
-                batch_size=random.randint(1, self.max_mlp_batch_size),
-                hidden_activation=random.choice(activations),
+                hidden_layers=int(self.rng.integers(1, self.max_mlp_hidden, endpoint=True)),
+                epochs=int(self.rng.integers(1, self.max_mlp_epochs, endpoint=True)),
+                batch_size=int(self.rng.integers(1, self.max_mlp_batch_size, endpoint=True)),
+                hidden_activation=self.rng.choice(activations),
                 early_stopping=self.early_stopping
             )
             self.weak_predictors.append(mlp)
-
-
-    def fit(self, x, y, validation_split=0.2):
-        return super().fit(x, y, validation_split=len(y))
-
-    def predict(self, x):
-        return super().predict(x)
-
