@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
@@ -8,11 +9,12 @@ class LSTMWrapper:
                  inputs,
                  timesteps,
                  units,
-                 epochs,
-                 batch_size,
+                 epochs=1,
+                 batch_size=32,
                  lstm_activation='relu',
                  output_activation='linear',
                  optimizer='adam',
+                 learning_rate=0.001,
                  loss='mse',
                  early_stopping=5):
 
@@ -24,6 +26,7 @@ class LSTMWrapper:
         self._lstm_activation = lstm_activation
         self._output_activation = output_activation
         self._optimizer = optimizer
+        self._learning_rate = learning_rate
         self._loss = loss
         self._early_stopping = early_stopping
         self._model = None
@@ -35,21 +38,16 @@ class LSTMWrapper:
             LSTM(self._units, activation=self._lstm_activation),
             Dense(1, activation=self._output_activation)
         ])
-        self._model.compile(optimizer=self._optimizer, loss=self._loss)
 
-    def _apply_sliding_window(self, x):
-        x_seq = []
-        for i in range(len(x) - self._timesteps + 1):
-            x_seq.append(x[i: i + self._timesteps])
-        return np.array(x_seq)
+        opt = tf.keras.optimizers.get(self._optimizer)
+        opt.learning_rate = self._learning_rate
+        self._model.compile(optimizer=opt, loss=self._loss)
 
     def fit(self, x, y, validation_split=0.2):
         x_2d = np.asarray(x)
         y_arr = np.asarray(y)
 
-        x_3d = self._apply_sliding_window(x_2d)
-
-        y_adjusted = y_arr[self._timesteps - 1:]
+        x_3d = np.reshape(x_2d, (x_2d.shape[0], self._timesteps, -1))
 
         callbacks = []
         if self._early_stopping > 0 and validation_split > 0:
@@ -58,12 +56,12 @@ class LSTMWrapper:
             ))
 
         self._model.fit(
-            x_3d, y_adjusted, epochs=self._epochs, validation_split=validation_split, batch_size=self._batch_size,
+            x_3d, y_arr, epochs=self._epochs, validation_split=validation_split, batch_size=self._batch_size,
             callbacks=callbacks, verbose=0
         )
         return self
 
     def predict(self, x):
         x_2d = np.asarray(x)
-        x_3d = self._apply_sliding_window(x_2d)
+        x_3d = np.reshape(x_2d, (x_2d.shape[0], self._timesteps, -1))
         return self._model.predict(x_3d, verbose=0).flatten()

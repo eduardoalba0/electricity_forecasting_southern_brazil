@@ -6,8 +6,6 @@ class WSBagging:
     def __init__(self,
                  inputs,
                  timesteps,
-                 strong_predictor=None,
-                 weak_predictors=None,
                  strong_weight=0.5,
                  weak_weight=0.5,
                  bootstrap=True,
@@ -21,8 +19,8 @@ class WSBagging:
             raise ValueError("Ratios must be in (0.0, 1.0] interval.")
 
         self._inputs = inputs
-        self._strong_predictor = strong_predictor
-        self._weak_predictors = weak_predictors if weak_predictors is not None else []
+        self._strong_predictor = None
+        self._weak_predictors =  []
         self._strong_weight = strong_weight
         self._weak_weight = weak_weight
 
@@ -35,15 +33,10 @@ class WSBagging:
 
         self._random_state = random_state
         self._rng = np.random.default_rng(self._random_state)
-        self._feature_index_ = []
+        self._feature_index = []
 
-    def _align_weak_data(self, x, y=None):
-        if y is not None:
-            return x, y
-        return x
-
-    def _align_targets(self, y):
-        return y
+    def _build_model(self):
+        raise NotImplementedError
 
     def fit(self, x, y, validation_split=0.2):
         x_arr = np.asarray(x)
@@ -58,10 +51,8 @@ class WSBagging:
         if self._strong_predictor is not None:
             self._strong_predictor.fit(x_train, y_train)
 
-        x_weak, y_weak = self._align_weak_data(x_train, y_train)
-
-        n_samples_weak, n_features = x_weak.shape
-        sample_size = max(1, int(n_samples_weak * self._bootstrap_ratio))
+        n_samples = x_train.shape[0]
+        sample_size = max(1, int(n_samples * self._bootstrap_ratio))
 
         if sample_size < self._timesteps:
             sample_size = self._timesteps
@@ -70,7 +61,7 @@ class WSBagging:
 
         candidates = list(self._weak_predictors)
         self._weak_predictors = []
-        self._feature_index_ = []
+        self._feature_index = []
 
         best_mse = float('inf')
         patience_counter = 0
@@ -78,40 +69,39 @@ class WSBagging:
 
         if validation_split > 0:
             baseline_preds = self.predict(x_val)
-            y_val_adj = self._align_targets(y_val)
-            best_mse = mean_squared_error(y_val_adj, baseline_preds)
+            best_mse = mean_squared_error(y_val, baseline_preds)
 
         for i, predictor in enumerate(candidates):
             if self._bootstrap:
-                start = int(self._rng.integers(0, n_samples_weak - sample_size + 1))
+                start = int(self._rng.integers(0, n_samples - sample_size + 1))
                 row_idx = np.arange(start, start + sample_size)
             else:
-                row_idx = np.arange(n_samples_weak)
+                row_idx = np.arange(n_samples)
 
             if self._random_patches:
-                col_idx = self._rng.choice(n_features, size=patch_size, replace=False)
+                col_idx = self._rng.choice(self._inputs, size=patch_size, replace=False)
             else:
-                col_idx = np.arange(n_features)
+                col_idx = np.arange(self._inputs)
 
-            predictor.fit(x_weak[np.ix_(row_idx, col_idx)], y_weak[row_idx])
+            predictor.fit(x_train[np.ix_(row_idx, col_idx)], y_train[row_idx])
             self._weak_predictors.append(predictor)
-            self._feature_index_.append(col_idx)
+            self._feature_index.append(col_idx)
 
             if validation_split > 0:
                 current_preds = self.predict(x_val)
-                current_mse = mean_squared_error(y_val_adj, current_preds)
+                current_mse = mean_squared_error(y_val, current_preds)
 
                 if current_mse < best_mse:
                     best_mse = current_mse
                     patience_counter = 0
-                    best_state = (list(self._weak_predictors), list(self._feature_index_))
+                    best_state = (list(self._weak_predictors), list(self._feature_index))
                 else:
                     patience_counter += 1
                     if patience_counter >= self._early_stopping:
                         break
 
         if validation_split > 0 and len(best_state[0]) > 0:
-            self._weak_predictors, self._feature_index_ = best_state
+            self._weak_predictors, self._feature_index = best_state
 
         return self
 
@@ -122,8 +112,7 @@ class WSBagging:
         if self._strong_predictor is not None:
             strong_preds = np.asarray(self._strong_predictor.predict(x_arr)).reshape(-1)
 
-        x_weak = self._align_weak_data(x_arr)
-        n_preds = len(x_weak)
+        n_preds = len(x_arr)
 
         if len(self._weak_predictors) == 0:
             return np.asarray(strong_preds) if self._strong_predictor is not None else np.zeros(n_preds)
@@ -131,9 +120,9 @@ class WSBagging:
         all_weak_preds = []
         for j in range(len(self._weak_predictors)):
             predictor = self._weak_predictors[j]
-            col_idx = self._feature_index_[j]
+            col_idx = self._feature_index[j]
 
-            x_subset = x_weak[:, col_idx]
+            x_subset = x_arr[:, col_idx]
             pred_j = np.asarray(predictor.predict(x_subset)).reshape(-1)
             all_weak_preds.append(pred_j)
 

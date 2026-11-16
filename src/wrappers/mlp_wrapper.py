@@ -1,17 +1,19 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Input, LSTM
+from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.callbacks import EarlyStopping
 
 class MLPWrapper:
     def __init__(self,
                  inputs,
                  hidden_layers,
-                 epochs,
-                 batch_size,
+                 epochs=1,
+                 batch_size=32,
                  hidden_activation='relu',
                  output_activation='linear',
                  optimizer='adam',
+                 learning_rate=0.001,
                  loss='mse',
                  early_stopping=5):
 
@@ -22,6 +24,7 @@ class MLPWrapper:
         self._hidden_activation = hidden_activation
         self._output_activation = output_activation
         self._optimizer = optimizer
+        self._learning_rate = learning_rate
         self._loss = loss
         self._early_stopping = early_stopping
         self._model = None
@@ -33,7 +36,9 @@ class MLPWrapper:
             Dense(self._hidden_layers, activation=self._hidden_activation),
             Dense(1, activation=self._output_activation)
         ])
-        self._model.compile(optimizer=self._optimizer, loss=self._loss)
+        opt = tf.keras.optimizers.get(self._optimizer)
+        opt.learning_rate = self._learning_rate
+        self._model.compile(optimizer=opt, loss=self._loss)
 
     def fit(self, x, y, validation_split=0.2):
         x_2d = np.asarray(x)
