@@ -19,6 +19,8 @@ ERA5_VARS = [
 
 STATES = ["PR", "SC", "RS"]
 
+TARGETS = ["Residential", "Industrial", "Commercial", "Other"]
+
 QUADRANTS = ["Q1", "Q2", "Q3", "Q4"]
 
 HOURS = ["0900", "1800", "2100"]
