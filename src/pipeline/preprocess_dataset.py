@@ -7,8 +7,8 @@ import sys
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(os.path.join(BASE_DIR, "src"))
 
-from utils.constants import STATES, QUADRANTS, CAMS_VARS, ERA5_VARS, MAX_WORKERS
-from utils.dataset_manipulators import quantile_outlier_removal
+from utils.constants import STATES, QUADRANTS, CAMS_VARS, ERA5_VARS, MAX_WORKERS, TARGETS
+from utils.dataset_manipulators import create_lags, quantile_outlier_removal
 
 RAW_DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
@@ -112,7 +112,7 @@ def preprocess_consumption_data(
 def main():
     raw_dir = RAW_DATA_DIR
     output_filepath = os.path.join(PROCESSED_DATA_DIR, "dataset.csv")
-    output_cleaned_filepath = os.path.join(PROCESSED_DATA_DIR, "dataset_cleaned.csv")
+    output_cleaned_filepath = os.path.join(PROCESSED_DATA_DIR, "dataset_final.csv")
 
     consumption_path = os.path.join(raw_dir, "consumption", "consumption.csv")
     df_consumption = preprocess_consumption_data(consumption_path)
@@ -152,7 +152,8 @@ def main():
         if col not in orig_cols and not col.startswith(dummy_prefixes)
     ]
     df_cleaned = quantile_outlier_removal(df_dataset, target=numeric_cols, groupby_col="State")
-    # Remove as variáveis originárias apenas de dataset_cleaned.csv
+    df_cleaned = create_lags(df_cleaned, lag_col=TARGETS, n_lags=12, groupby_col="State")
+    # Remove as variáveis originárias apenas de dataset_final.csv
     df_cleaned = df_cleaned.drop(columns=["State", "Month", "Year"])
     df_cleaned.to_csv(output_cleaned_filepath, index=True)
 
