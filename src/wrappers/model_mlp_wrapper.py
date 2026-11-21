@@ -4,10 +4,14 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.callbacks import EarlyStopping
 
+from utils.constants import ACTIVATIONS
+
+
 class MLPWrapper:
+
     def __init__(self,
-                 inputs,
-                 hidden_layers,
+                 inputs= 0,
+                 hidden_layers=0,
                  epochs=1,
                  batch_size=32,
                  hidden_activation='relu',
@@ -29,6 +33,7 @@ class MLPWrapper:
         self._early_stopping = early_stopping
         self._model = None
         self._build_model()
+
 
     def _build_model(self):
         self._model = Sequential([
@@ -58,3 +63,24 @@ class MLPWrapper:
     def predict(self, x):
         x_2d = np.asarray(x)
         return self._model.predict(x_2d, verbose=0).flatten()
+
+    @classmethod
+    def from_particle(cls, particle, **fixed_params):
+        act_idx = int(np.clip(round(particle[3]), 0, len(ACTIVATIONS) - 1))
+        return cls(
+            hidden_layers=max(1, int(round(particle[0]))),
+            epochs=max(1, int(round(particle[1]))),
+            batch_size=max(1, int(round(particle[2]))),
+            hidden_activation=ACTIVATIONS[act_idx],
+            learning_rate=float(particle[4]),
+            **fixed_params
+        )
+
+    def to_dict(self):
+        return {
+            'hidden_layers': self._hidden_layers,
+            'epochs': self._epochs,
+            'batch_size': self._batch_size,
+            'hidden_activation': self._hidden_activation,
+            'learning_rate': self._learning_rate,
+        }

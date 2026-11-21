@@ -2,14 +2,15 @@ import tensorflow as tf
 import numpy as np
 from ensemble.tf_weaker_separator import TensorWSBagging
 from tensorflow.keras.layers import Dense, Flatten, Input, Lambda
-from utils.constants import ACTIVATIONS
+from utils.constants import ACTIVATIONS, BATCH_SIZES
+
 
 class TensorMLPWSB(TensorWSBagging):
     def __init__(self,
                  inputs,
                  mlp_strong_hidden,
                  mlp_strong_activation,
-                 max_mlps,
+                 n_weak_mlps,
                  max_mlp_hidden,
                  epochs,
                  batch_size,
@@ -42,7 +43,7 @@ class TensorMLPWSB(TensorWSBagging):
         self._mlp_strong_hidden = mlp_strong_hidden
         self._mlp_strong_activation = mlp_strong_activation
 
-        self._n_weak_mlps = max_mlps
+        self._n_weak_mlps = n_weak_mlps
         self._max_mlp_hidden = max_mlp_hidden
 
     def _build_model(self):
@@ -79,3 +80,36 @@ class TensorMLPWSB(TensorWSBagging):
         self._strong_output = strong_out
         self._weak_outputs = weak_outputs
 
+    @classmethod
+    def from_particle(cls, particle, **fixed_params):
+        act_idx = int(np.clip(round(particle[1]), 0, len(ACTIVATIONS) - 1))
+        bth_idx = int(np.clip(round(particle[5]), 0, len(BATCH_SIZES) - 1))
+
+        return cls(
+            mlp_strong_hidden=max(1, int(round(particle[0]))),
+            mlp_strong_activation=ACTIVATIONS[act_idx],
+            n_weak_mlps=max(1, int(round(particle[2]))),
+            max_mlp_hidden=max(1, int(round(particle[3]))),
+            epochs=max(1, int(round(particle[4]))),
+            batch_size=BATCH_SIZES[bth_idx],
+            learning_rate=float(particle[6]),
+            strong_weight=float(particle[7]),
+            weak_weight=float(1.0 - particle[7]),
+            patches_ratio=float(particle[8]),
+            **fixed_params
+        )
+
+
+    def to_dict(self):
+        return {
+            'mlp_strong_hidden': self._mlp_strong_hidden,
+            'mlp_strong_activation': self._mlp_strong_activation,
+            'n_weak_mlps': self._n_weak_mlps,
+            'max_mlp_hidden': self._max_mlp_hidden,
+            'epochs': self._epochs,
+            'batch_size': self._batch_size,
+            'learning_rate': self._learning_rate,
+            'strong_weight': float(self._strong_weight.numpy()),
+            'weak_weight': float(self._weak_weight.numpy()),
+            'patches_ratio': self._patches_ratio,
+        }

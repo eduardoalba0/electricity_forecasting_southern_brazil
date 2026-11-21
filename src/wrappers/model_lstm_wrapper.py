@@ -4,6 +4,9 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
+from utils.constants import ACTIVATIONS
+
+
 class LSTMWrapper:
     def __init__(self,
                  inputs,
@@ -65,3 +68,24 @@ class LSTMWrapper:
         x_2d = np.asarray(x)
         x_3d = np.reshape(x_2d, (x_2d.shape[0], self._timesteps, -1))
         return self._model.predict(x_3d, verbose=0).flatten()
+
+    @classmethod
+    def from_particle(cls, particle, **fixed_params):
+        act_idx = int(np.clip(round(particle[3]), 0, len(ACTIVATIONS) - 1))
+        return cls(
+            units=max(1, int(round(particle[0]))),
+            epochs=max(1, int(round(particle[1]))),
+            batch_size=max(1, int(round(particle[2]))),
+            lstm_activation=ACTIVATIONS[act_idx],
+            learning_rate=float(particle[4]),
+            **fixed_params
+        )
+
+    def to_dict(self):
+        return {
+            'units': self._units,
+            'epochs': self._epochs,
+            'batch_size': self._batch_size,
+            'lstm_activation': self._lstm_activation,
+            'learning_rate': self._learning_rate,
+        }
