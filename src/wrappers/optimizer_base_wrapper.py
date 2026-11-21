@@ -38,7 +38,7 @@ class OptimizerBaseWrapper:
     def _optimize(self):
         raise NotImplementedError
 
-    def _run_objective_function(self, particle):
+    def _run_objective_function(self, solution_arr):
         csv_all = []
         model_params = None
 
@@ -55,14 +55,13 @@ class OptimizerBaseWrapper:
             x = data[self.features]
             y = data[self.target]
 
-            # TODO Impl. recursive prediction
             tscv = TimeSeriesSplit(n_splits=self.n_splits, test_size=self.test_size)
             for i_train, i_test in tscv.split(data):
                 x_train, y_train = x.iloc[i_train], y.iloc[i_train]
                 x_test, y_test = x.iloc[i_test], y.iloc[i_test]
 
                 tf.keras.backend.clear_session()
-                model = self.model_wrapper.from_particle(particle, **self.fixed_params)
+                model = self.model_wrapper.from_array(solution_arr, **self.fixed_params)
                 if model_params is None:
                     model_params = model.to_dict()
 

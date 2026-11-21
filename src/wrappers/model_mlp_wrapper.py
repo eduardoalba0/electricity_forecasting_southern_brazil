@@ -102,14 +102,14 @@ class MLPWrapper:
         })
 
     @classmethod
-    def from_particle(cls, particle, **fixed_params):
-        act_idx = int(np.clip(round(particle[3]), 0, len(ACTIVATIONS) - 1))
+    def from_array(cls, solution_arr, **fixed_params):
+        act_idx = int(np.clip(round(solution_arr[3]), 0, len(ACTIVATIONS) - 1))
         return cls(
-            hidden_layers=max(1, int(round(particle[0]))),
-            epochs=max(1, int(round(particle[1]))),
-            batch_size=max(1, int(round(particle[2]))),
+            hidden_layers=max(1, int(round(solution_arr[0]))),
+            epochs=max(1, int(round(solution_arr[1]))),
+            batch_size=max(1, int(round(solution_arr[2]))),
             hidden_activation=ACTIVATIONS[act_idx],
-            learning_rate=float(particle[4]),
+            learning_rate=float(solution_arr[4]),
             **fixed_params
         )
 

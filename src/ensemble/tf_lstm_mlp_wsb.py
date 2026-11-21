@@ -83,21 +83,21 @@ class TensorLSTMMLPWSB(TensorWSBagging):
         self._weak_outputs = weak_outputs
 
     @classmethod
-    def from_particle(cls, particle, **fixed_params):
-        act_idx = int(np.clip(round(particle[1]), 0, len(ACTIVATIONS) - 1))
-        bth_idx = int(np.clip(round(particle[5]), 0, len(BATCH_SIZES) - 1))
+    def from_array(cls, solution_arr, **fixed_params):
+        act_idx = int(np.clip(round(solution_arr[1]), 0, len(ACTIVATIONS) - 1))
+        bth_idx = int(np.clip(round(solution_arr[5]), 0, len(BATCH_SIZES) - 1))
 
         return cls(
-            lstm_units=max(1, int(round(particle[0]))),
+            lstm_units=max(1, int(round(solution_arr[0]))),
             lstm_activation=ACTIVATIONS[act_idx],
-            n_weak_mlps=max(1, int(round(particle[2]))),
-            max_mlp_hidden=max(1, int(round(particle[3]))),
-            epochs=max(1, int(round(particle[4]))),
+            n_weak_mlps=max(1, int(round(solution_arr[2]))),
+            max_mlp_hidden=max(1, int(round(solution_arr[3]))),
+            epochs=max(1, int(round(solution_arr[4]))),
             batch_size=BATCH_SIZES[bth_idx],
-            learning_rate=float(particle[6]),
-            strong_weight=float(particle[7]),
-            weak_weight=float(1.0 - particle[7]),
-            patches_ratio=float(particle[8]),
+            learning_rate=float(solution_arr[6]),
+            strong_weight=float(solution_arr[7]),
+            weak_weight=float(1.0 - solution_arr[7]),
+            patches_ratio=float(solution_arr[8]),
             **fixed_params
         )
 
