@@ -1,4 +1,6 @@
+import shap
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, LSTM
@@ -19,7 +21,8 @@ class LSTMWrapper:
                  optimizer='adam',
                  learning_rate=0.001,
                  loss='mse',
-                 early_stopping=5):
+                 early_stopping=5,
+                 random_state=42):
 
         self._inputs = inputs
         self._units = units
@@ -32,6 +35,8 @@ class LSTMWrapper:
         self._learning_rate = learning_rate
         self._loss = loss
         self._early_stopping = early_stopping
+        self._rng = np.random.default_rng(random_state)
+
         self._model = None
         self._build_model()
 
@@ -68,6 +73,38 @@ class LSTMWrapper:
         x_2d = np.asarray(x)
         x_3d = np.reshape(x_2d, (x_2d.shape[0], self._timesteps, -1))
         return self._model.predict(x_3d, verbose=0).flatten()
+
+    def get_importance(self, x, evaluation_split=0.2, normalize=True):
+        x_arr = np.asarray(x)
+        n_samples = len(x_arr)
+
+        if evaluation_split >= 1.0:
+            n_eval = int(evaluation_split)
+        else:
+            n_eval = int(round(n_samples * evaluation_split))
+
+        n_eval = max(1, min(n_samples - 1, n_eval))
+        split_idx = n_samples - n_eval
+
+        bg_data = x_arr[:split_idx]
+        eval_data = x_arr[split_idx:]
+
+        explainer = shap.Explainer(self.predict, bg_data)
+        shap_values = explainer(eval_data)
+        importance = np.mean(np.abs(shap_values.values), axis=0)
+
+        if normalize and np.sum(importance) > 0:
+            importance = importance / np.sum(importance)
+
+        if hasattr(x, "columns"):
+            feature_names = list(x.columns)
+        else:
+            feature_names = [f"feature_{i}" for i in range(x_arr.shape[1])]
+
+        return pd.DataFrame({
+            "feature": feature_names,
+            "importance": importance
+        })
 
     @classmethod
     def from_particle(cls, particle, **fixed_params):
