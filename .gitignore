@@ -227,3 +227,4 @@ credentials.py
 /.idea/vcs.xml
 /.idea/workspace.xml
 /skills/system/run-workflow/SKILL.md
+/.idea/.gitignore

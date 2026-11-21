@@ -1,6 +1,4 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-
 
 def create_lags(dataset, lag_col, n_lags, groupby_col=None):
     cols = [lag_col] if isinstance(lag_col, str) else list(lag_col)
@@ -13,7 +11,7 @@ def create_lags(dataset, lag_col, n_lags, groupby_col=None):
 
     return pd.concat([dataset] + lag_dfs, axis=1)
 
-def quantile_outlier_removal(dataset, target, groupby_col=None, factor=1.5):
+def quantile_outlier_inputation(dataset, target, groupby_col=None, factor=1.5):
     df = dataset.copy()
     cols = [target] if isinstance(target, str) else list(target)
 
@@ -31,18 +29,3 @@ def quantile_outlier_removal(dataset, target, groupby_col=None, factor=1.5):
 
     df[cols] = df[cols].clip(lower=lim_inf, upper=lim_sup, axis=1)
     return df
-
-
-
-def normalize_dataset(dataset, cols, groupby_col=None):
-    df_norm = dataset.copy()
-
-    if groupby_col is not None:
-        for state, group in df_norm.groupby(groupby_col):
-            scaler = MinMaxScaler()
-            df_norm.loc[group.index, cols] = scaler.fit_transform(group[cols])
-    else:
-        scaler = MinMaxScaler()
-        df_norm[cols] = scaler.fit_transform(df_norm[cols])
-
-    return df_norm

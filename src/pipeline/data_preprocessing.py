@@ -1,25 +1,29 @@
 import os
+import sys
 from concurrent.futures import ProcessPoolExecutor
 from typing import List, Tuple
 import pandas as pd
 
-import sys
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(os.path.join(BASE_DIR, "src"))
 
-from utils.constants import STATES, QUADRANTS, CAMS_VARS, ERA5_VARS, MAX_WORKERS, TARGETS
-from utils.dataset_manipulators import create_lags, quantile_outlier_removal
+from utils.dataset_manipulators import quantile_outlier_inputation, create_lags
+from utils.constants import STATES, QUADRANTS, CAMS_VARS, ERA5_VARS, MAX_WORKERS, TARGETS, WEATHER_AGG_STATS, \
+    CONSUMERS_VARS
 
 RAW_DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
-
 
 def process_single_weather_file(
     filepath,
     state,
     quadrant,
     variables,
+    agg_stats=None,
 ):
+    if agg_stats is None:
+        agg_stats = WEATHER_AGG_STATS
+
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"Weather file not found: {filepath}")
 
@@ -35,9 +39,11 @@ def process_single_weather_file(
     aggregated = (
         df[variables]
         .groupby([date_key.rename("Date"), hour_key.rename("Hour")], sort=False)
-        .mean()
-        .reset_index()
+        .agg(agg_stats)
     )
+
+    aggregated.columns = [f"{var}::{stat}" for var, stat in aggregated.columns]
+    aggregated = aggregated.reset_index()
 
     aggregated["State"] = state
     aggregated["Quadrant"] = quadrant
@@ -46,29 +52,31 @@ def process_single_weather_file(
 
 
 def _weather_worker(task):
-    filepath, dataset_type, state, quadrant, variables = task
+    filepath, dataset_type, state, quadrant, variables, agg_stats = task
     return (
         dataset_type,
-        process_single_weather_file(filepath, state, quadrant, variables),
+        process_single_weather_file(filepath, state, quadrant, variables, agg_stats=agg_stats),
     )
 
 
 def process_all_weather_data(
     states=None,
     quadrants=None,
+    agg_stats=None,
 ):
     states = states or STATES
     quadrants = quadrants or QUADRANTS
+    agg_stats = agg_stats or WEATHER_AGG_STATS
 
-    tasks: List[Tuple[str, str, str, str, List[str]]] = []
+    tasks: List[Tuple[str, str, str, str, List[str], List[str]]] = []
 
     for state in states:
         for quad in quadrants:
             cams_file = os.path.join(RAW_DATA_DIR, "cams", f"{state}_{quad}.csv")
             era5_file = os.path.join(RAW_DATA_DIR, "era5", f"{state}_{quad}.csv")
 
-            tasks.append((cams_file, "cams", state, quad, CAMS_VARS))
-            tasks.append((era5_file, "era5", state, quad, ERA5_VARS))
+            tasks.append((cams_file, "cams", state, quad, CAMS_VARS, agg_stats))
+            tasks.append((era5_file, "era5", state, quad, ERA5_VARS, agg_stats))
 
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = list(executor.map(_weather_worker, tasks))
@@ -86,15 +94,18 @@ def process_all_weather_data(
         how="inner",
     )
 
-    all_variables = CAMS_VARS + ERA5_VARS
+    weather_stat_vars = [c for c in merged_weather.columns if "::" in c]
 
     pivoted = merged_weather.pivot(
         index=["State", "Date"],
         columns=["Quadrant", "Hour"],
-        values=all_variables,
+        values=weather_stat_vars,
     )
 
-    pivoted.columns = [f"{var}_{quad}_{hour}" for var, quad, hour in pivoted.columns]
+    pivoted.columns = [
+        f"{col.split('::')[0]}_{quad}_{hour}_{col.split('::')[1]}"
+        for col, quad, hour in pivoted.columns
+    ]
     return pivoted.reset_index()
 
 
@@ -105,7 +116,6 @@ def preprocess_consumption_data(
         raise FileNotFoundError(f"Consumption file not found: {consumption_filepath}")
 
     df_consumption = pd.read_csv(consumption_filepath)
-    df_consumption = df_consumption.drop_duplicates(subset=["Date", "State"], keep="first")
     return df_consumption
 
 
@@ -139,21 +149,32 @@ def main():
     orig_vars = df_merged[["State", "Month", "Year"]]
     df_features = df_merged.drop(columns=["State", "Month", "Year", "_dt"])
 
-    # dataset.csv mantém as variáveis originárias dos dummies
     df_dataset = pd.concat([orig_vars, state_dummies, month_dummies, year_dummies, df_features], axis=1)
+
+    # Remove colunas com variância zero (constantes)
+    zero_var_cols = [c for c in df_dataset.select_dtypes(include="number").columns if df_dataset[c].std() == 0]
+    if zero_var_cols:
+        df_dataset = df_dataset.drop(columns=zero_var_cols)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_filepath)), exist_ok=True)
     df_dataset.to_csv(output_filepath, index=True)
 
-    dummy_prefixes = ("State_", "Month_", "Year_")
-    orig_cols = ("State", "Month", "Year")
+    weather_prefixes = tuple(ERA5_VARS) + tuple(CAMS_VARS)
     numeric_cols = [
-        col for col in df_dataset.columns
-        if col not in orig_cols and not col.startswith(dummy_prefixes)
+        col for col in TARGETS + CONSUMERS_VARS + [
+            c for c in df_dataset.columns if c.startswith(weather_prefixes)
+        ]
+        if col in df_dataset.columns
     ]
-    df_cleaned = quantile_outlier_removal(df_dataset, target=numeric_cols, groupby_col="State")
+
+    df_cleaned = quantile_outlier_inputation(df_dataset, target=numeric_cols)
+
+    # Remove colunas que ficaram com variância zero após imputação/corte de outliers
+    zero_var_cleaned = [c for c in df_cleaned.select_dtypes(include="number").columns if df_cleaned[c].std() == 0]
+    if zero_var_cleaned:
+        df_cleaned = df_cleaned.drop(columns=zero_var_cleaned)
+
     df_cleaned = create_lags(df_cleaned, lag_col=TARGETS, n_lags=12, groupby_col="State")
-    # Remove as variáveis originárias apenas de dataset_final.csv
     df_cleaned = df_cleaned.drop(columns=["State", "Month", "Year"])
     df_cleaned.to_csv(output_cleaned_filepath, index=True)
 

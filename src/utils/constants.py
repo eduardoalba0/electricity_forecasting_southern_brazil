@@ -16,10 +16,13 @@ ERA5_VARS = [
     "Total cloud cover",
 ]
 
+WEATHER_AGG_STATS = ["mean", "max", "min", "sum", "std"]
 
 STATES = ["PR", "SC", "RS"]
 
 TARGETS = ["Residential", "Industrial", "Commercial", "Other"]
+
+CONSUMERS_VARS = ["Residential Consumers", "Industrial Consumers", "Commercial Consumers", "Other Consumers"]
 
 QUADRANTS = ["Q1", "Q2", "Q3", "Q4"]
 
