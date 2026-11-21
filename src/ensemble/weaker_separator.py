@@ -1,4 +1,6 @@
+import shap
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
@@ -158,3 +160,35 @@ class WSBagging:
             final_preds.append(pred)
 
         return np.array(final_preds)
+
+    def get_importance(self, x, evaluation_split=0.2, normalize=True):
+        x_arr = np.asarray(x)
+        n_samples = len(x_arr)
+
+        if evaluation_split >= 1.0:
+            n_eval = int(evaluation_split)
+        else:
+            n_eval = int(round(n_samples * evaluation_split))
+
+        n_eval = max(1, min(n_samples - 1, n_eval))
+        split_idx = n_samples - n_eval
+
+        bg_data = x_arr[:split_idx]
+        eval_data = x_arr[split_idx:]
+
+        explainer = shap.Explainer(self.predict, bg_data)
+        shap_values = explainer(eval_data)
+        importance = np.mean(np.abs(shap_values.values), axis=0)
+
+        if normalize and np.sum(importance) > 0:
+            importance = importance / np.sum(importance)
+
+        if hasattr(x, "columns"):
+            feature_names = list(x.columns)
+        else:
+            feature_names = [f"feature_{i}" for i in range(x_arr.shape[1])]
+
+        return pd.DataFrame({
+            "feature": feature_names,
+            "importance": importance
+        })
