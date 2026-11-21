@@ -6,14 +6,12 @@ import pygrib
 import numpy as np
 from collections import defaultdict
 
+from utils.constants import URL_CDS, URL_ADS
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(BASE_DIR)
 from credentials import KEY_ADS_CDS
 
-URL_ADS = "https://ads.atmosphere.copernicus.eu/api"
-URL_CDS = "https://cds.climate.copernicus.eu/api"
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PATH = os.path.join(BASE_DIR, "data", "raw")
 
 os.makedirs(os.path.join(PATH, "cams"), exist_ok=True)
@@ -98,8 +96,8 @@ def process_cams_request(state, region_name, region_coords):
         if not os.path.exists(filename_grib):
             print(f"Attempting to download {filename_grib}")
             dataset = "cams-global-reanalysis-eac4"
-            client_ADS = cdsapi.Client(url=URL_ADS, key=KEY_ADS_CDS)
-            client_ADS.retrieve(dataset, request, filename_grib)
+            client = cdsapi.Client(url=URL_ADS, key=KEY_ADS_CDS)
+            client.retrieve(dataset, request, filename_grib)
 
         print(f"Starting conversion: {state}_{region_name}")
 
@@ -142,8 +140,8 @@ def process_era5_region(state, region_name, region_coords):
         if not os.path.exists(filename_grib):
             print(f"Attempting to download {filename_grib}")
             dataset = "reanalysis-era5-single-levels"
-            client_CDS = cdsapi.Client(url=URL_CDS, key=KEY_ADS_CDS)
-            client_CDS.retrieve(dataset, request, filename_grib)
+            client = cdsapi.Client(url=URL_CDS, key=KEY_ADS_CDS)
+            client.retrieve(dataset, request, filename_grib)
 
         print(f"Starting conversion: {state}_{region_name}")
 

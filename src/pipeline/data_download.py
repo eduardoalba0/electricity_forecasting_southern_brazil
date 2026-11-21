@@ -1,8 +1,10 @@
 import concurrent.futures
+
+from utils.constants import MAX_WORKERS
 from utils.copernicus_downloader import regions, process_cams_request, process_era5_region
 
-if __name__ == '__main__':
-    with concurrent.futures.ProcessPoolExecutor(max_workers=24) as executor:
+def main():
+    with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
 
         for state, quadrants in regions.items():
@@ -15,3 +17,6 @@ if __name__ == '__main__':
                 future.result()
             except Exception as exc:
                 print(f"Process generated an exception: {exc}")
+
+if __name__ == '__main__':
+    main()
