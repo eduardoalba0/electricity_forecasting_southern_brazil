@@ -1,0 +1,13 @@
+State,Consumption,KPSS Stat,KPSS p-value,KPSS Conclusion (alpha=0.05),MK Tau,MK Sen Slope,MK p-value,MK Conclusion (alpha=0.05),KW Stat,KW p-value,KW Conclusion (alpha=0.05)
+PR,Residential,2.3346,<= 0.01,Non-Stationary,0.8652,1633.46,0.00e+00,Upward Trend,4.0885,0.9673,Non-Seasonal
+PR,Industrial,2.3947,<= 0.01,Non-Stationary,0.8383,2012.98,0.00e+00,Upward Trend,6.5703,0.8327,Non-Seasonal
+PR,Commercial,2.3105,<= 0.01,Non-Stationary,0.7799,1394.94,0.00e+00,Upward Trend,15.2222,0.1725,Non-Seasonal
+PR,Other,2.4623,<= 0.01,Non-Stationary,0.8487,1209.37,0.00e+00,Upward Trend,7.6852,0.7412,Non-Seasonal
+SC,Residential,2.373,<= 0.01,Non-Stationary,0.8015,1403.86,0.00e+00,Upward Trend,14.7692,0.1933,Non-Seasonal
+SC,Industrial,2.3709,<= 0.01,Non-Stationary,0.8044,1748.08,0.00e+00,Upward Trend,11.5111,0.4015,Non-Seasonal
+SC,Commercial,2.3658,<= 0.01,Non-Stationary,0.7648,1137.24,0.00e+00,Upward Trend,22.2717,0.0224,Seasonal
+SC,Other,2.2955,<= 0.01,Non-Stationary,0.7077,1116.77,0.00e+00,Upward Trend,13.7156,0.2491,Non-Seasonal
+RS,Residential,2.3755,<= 0.01,Non-Stationary,0.7869,1742.98,0.00e+00,Upward Trend,15.0568,0.1799,Non-Seasonal
+RS,Industrial,1.0205,<= 0.01,Non-Stationary,0.2493,312.35,1.60e-09,Upward Trend,71.138,7.42e-11,Seasonal
+RS,Commercial,1.9227,<= 0.01,Non-Stationary,0.5041,681.18,0.00e+00,Upward Trend,64.4773,1.35e-09,Seasonal
+RS,Other,1.7051,<= 0.01,Non-Stationary,0.3147,651.13,2.58e-14,Upward Trend,138.5033,3.28e-24,Seasonal
