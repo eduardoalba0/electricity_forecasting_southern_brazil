@@ -1,10 +1,16 @@
+from os import name
+
 import shap
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from keras.src.layers import Concatenate
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Add, Average, Lambda, Dense
 from tensorflow.keras.models import Model
+
+from utils.dataset_manipulators import recursive_predict
+
 
 class TensorWSBagging:
     def __init__(self,
@@ -20,6 +26,7 @@ class TensorWSBagging:
                  random_patches=True,
                  patches_ratio=0.5,
                  early_stopping=5,
+                 auto_weights=False,
                  random_state=42):
 
         if not (0.0 < patches_ratio <= 1.0):
@@ -40,11 +47,13 @@ class TensorWSBagging:
         self._patches_ratio = patches_ratio
         self._early_stopping = early_stopping
         self._timesteps = timesteps
+        self._auto_weights = auto_weights
 
         self._random_state = random_state
         self._rng = np.random.default_rng(self._random_state)
         self._feature_index = []
 
+        self._target = None
         self._model = None
         self._ensemble_input = None
         self._strong_output = None
@@ -58,14 +67,16 @@ class TensorWSBagging:
             avg_weak = Average(name='avg_weak')(self._weak_outputs)
 
             if self._strong_output is not None:
-                weight_sum = self._strong_weight + self._weak_weight
-                w_strong = self._strong_weight / weight_sum
-                w_weak = self._weak_weight / weight_sum
-
-                weighted_strong = self._strong_output * w_strong
-                weighted_weak = avg_weak * w_weak
-
-                final_output = Add(name="ensemble_weights")([weighted_strong, weighted_weak])
+                if self._auto_weights:
+                    merged_preds = Concatenate(axis=-1, name="concat_preds")([self._strong_output, avg_weak])
+                    final_output = Dense(units=1, activation="linear", name="ensemble_weights")(merged_preds)
+                else:
+                    weight_sum = self._strong_weight + self._weak_weight
+                    w_strong = self._strong_weight / weight_sum
+                    w_weak = self._weak_weight / weight_sum
+                    weighted_strong = self._strong_output * w_strong
+                    weighted_weak = avg_weak * w_weak
+                    final_output = Add(name="ensemble_weights")([weighted_strong, weighted_weak])
             else:
                 final_output = avg_weak
 
@@ -76,10 +87,16 @@ class TensorWSBagging:
 
         opt = tf.keras.optimizers.get(self._optimizer)
         opt.learning_rate = self._learning_rate
-        self._model.compile(optimizer=opt, loss=self._loss)
+        self._model.compile(optimizer=opt, loss=self._loss, jit_compile=True)
 
 
     def fit(self, x, y, validation_split=0.2):
+        if hasattr(y, 'name') and y.name:
+            self._target = str(y.name)
+        elif hasattr(y, 'columns'):
+            self._target = list(y.columns)[0]
+        else:
+            self._target = None
 
         if self._model is None:
             self._build_model()
@@ -105,9 +122,24 @@ class TensorWSBagging:
             verbose=0
         )
 
-    def predict(self, x):
+    def predict(self, x, recursive=True):
+        if not recursive or len(x) <= 1:
+            return self._predict_raw(x)
+        return recursive_predict(self._predict_raw, x, target_name=self._target)
+
+    def _predict_raw(self, x):
         x_arr = np.asarray(x)
-        return self._model.predict(x=x_arr, verbose=0).flatten()
+        if hasattr(self._model, "input_shape") and len(self._model.input_shape) == 2:
+            if x_arr.ndim == 1:
+                x_arr = x_arr.reshape(1, -1)
+            elif x_arr.ndim == 3:
+                x_arr = x_arr.reshape(x_arr.shape[0], -1)
+        elif hasattr(self._model, "input_shape") and len(self._model.input_shape) == 3:
+            if x_arr.ndim == 1:
+                x_arr = x_arr.reshape(1, 1, -1)
+            elif x_arr.ndim == 2:
+                x_arr = np.reshape(x_arr, (x_arr.shape[0], self._timesteps, -1))
+        return self._model(x_arr, training=False).numpy().flatten()
 
     def get_importance(self, x, evaluation_split=0.2, normalize=True):
         x_arr = np.asarray(x)
@@ -124,17 +156,15 @@ class TensorWSBagging:
         bg_data = x_arr[:split_idx]
         eval_data = x_arr[split_idx:]
 
-        explainer = shap.Explainer(self.predict, bg_data)
+        explainer = shap.GradientExplainer(self._model, bg_data)
         shap_values = explainer(eval_data)
-        importance = np.mean(np.abs(shap_values.values), axis=0)
+        vals = shap_values.values if hasattr(shap_values, "values") else shap_values
+        importance = np.mean(np.abs(vals), axis=0).flatten()
 
         if normalize and np.sum(importance) > 0:
             importance = importance / np.sum(importance)
 
-        if hasattr(x, "columns"):
-            feature_names = list(x.columns)
-        else:
-            feature_names = [f"feature_{i}" for i in range(x_arr.shape[1])]
+        feature_names = list(x.columns)
 
         return pd.DataFrame({
             "feature": feature_names,

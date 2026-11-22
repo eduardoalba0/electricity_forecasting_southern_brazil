@@ -23,6 +23,7 @@ class TensorLSTMMLPWSB(TensorWSBagging):
                  random_patches=True,
                  patches_ratio=0.5,
                  early_stopping=5,
+                 auto_weights=False,
                  random_state=42):
 
         super().__init__(
@@ -38,6 +39,7 @@ class TensorLSTMMLPWSB(TensorWSBagging):
             random_patches=random_patches,
             patches_ratio=patches_ratio,
             early_stopping=early_stopping,
+            auto_weights=auto_weights,
             random_state=random_state
         )
 
@@ -81,6 +83,14 @@ class TensorLSTMMLPWSB(TensorWSBagging):
         self._ensemble_input = ensemble_input
         self._strong_output = strong_out
         self._weak_outputs = weak_outputs
+
+    def _predict_raw(self, x):
+        x_2d = np.asarray(x)
+        if x_2d.ndim == 1:
+            x_2d = x_2d.reshape(1, -1)
+        elif x_2d.ndim == 3:
+            x_2d = x_2d.reshape(x_2d.shape[0], -1)
+        return self._model.predict(x_2d, verbose=0).flatten()
 
     @classmethod
     def from_array(cls, solution_arr, **fixed_params):

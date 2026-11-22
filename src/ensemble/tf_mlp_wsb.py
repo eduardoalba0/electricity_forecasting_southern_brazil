@@ -22,6 +22,7 @@ class TensorMLPWSB(TensorWSBagging):
                  random_patches=True,
                  patches_ratio=0.5,
                  early_stopping=5,
+                 auto_weights=False,
                  random_state=42):
 
         super().__init__(
@@ -37,6 +38,7 @@ class TensorMLPWSB(TensorWSBagging):
             random_patches=random_patches,
             patches_ratio=patches_ratio,
             early_stopping=early_stopping,
+            auto_weights=auto_weights,
             random_state=random_state
         )
 

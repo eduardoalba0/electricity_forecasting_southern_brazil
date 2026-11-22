@@ -1,12 +1,14 @@
 import numpy as np
 from pyswarms.single import GlobalBestPSO
+from joblib import Parallel, delayed
 
+from utils.constants import N_JOBS
 from wrappers import OptimizerBaseWrapper
 
 
 class PSOWrapper(OptimizerBaseWrapper):
     def __init__(self, dataset, features, target, model_name, model_wrapper,
-                 n_solutions, n_iter, bounds, path, fixed_params=None,
+                 n_solutions, n_iter, bounds, path, feature_selection=False, feature_importances=None, fixed_params=None,
                  options=None, n_splits=5, test_size=1, groupby_col=None, seed=42):
 
         super().__init__(
@@ -18,6 +20,8 @@ class PSOWrapper(OptimizerBaseWrapper):
             n_solutions=n_solutions,
             n_iter=n_iter,
             path=path,
+            feature_selection=feature_selection,
+            feature_importances=feature_importances,
             fixed_params=fixed_params,
             n_splits=n_splits,
             test_size=test_size,
@@ -35,17 +39,17 @@ class PSOWrapper(OptimizerBaseWrapper):
         pso_bounds = (np.array(lower, dtype=float), np.array(upper, dtype=float))
 
         self._optimizer = GlobalBestPSO(
-            n_particles=self.n_solutions,
+            n_particles=self._n_solutions,
             dimensions=len(lower),
             options=self._options,
             bounds=pso_bounds
         )
 
     def _optimize(self):
-        return self._optimizer.optimize(self._run, iters=self.n_iter)
+        return self._optimizer.optimize(self._run, iters=self._n_iter)
 
     def _run(self, parts):
-        fit_lst = [self._run_objective_function(parts[j]) for j in range(self.n_solutions)]
+        fit_lst = [self._run_objective_function(parts[j]) for j in range(self._n_solutions)]
 
         self.solutions.sort(key=lambda s: s['fitness'])
         self.iter.append(self.solutions[0])

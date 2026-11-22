@@ -107,12 +107,12 @@ class WSBagging:
 
         return self
 
-    def predict(self, x):
+    def predict(self, x, recursive=True):
         x_arr = np.asarray(x)
         strong_preds = []
 
         if self._strong_predictor is not None:
-            strong_preds = np.asarray(self._strong_predictor.predict(x_arr)).reshape(-1)
+            strong_preds = np.asarray(self._strong_predictor.predict(x_arr, recursive=recursive)).reshape(-1)
 
         n_preds = len(x_arr)
 
@@ -125,7 +125,7 @@ class WSBagging:
             col_idx = self._feature_index[j]
 
             x_subset = x_arr[:, col_idx]
-            pred_j = np.asarray(predictor.predict(x_subset)).reshape(-1)
+            pred_j = np.asarray(predictor.predict(x_subset, recursive=recursive)).reshape(-1)
             all_weak_preds.append(pred_j)
 
         weight_sum = self._strong_weight + self._weak_weight

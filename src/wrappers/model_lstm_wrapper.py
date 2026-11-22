@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Dense, Input, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
 from utils.constants import ACTIVATIONS
+from utils.dataset_manipulators import recursive_predict
 
 
 class LSTMWrapper:
@@ -37,6 +38,7 @@ class LSTMWrapper:
         self._early_stopping = early_stopping
         self._rng = np.random.default_rng(random_state)
 
+        self._target = None
         self._model = None
         self._build_model()
 
@@ -49,9 +51,11 @@ class LSTMWrapper:
 
         opt = tf.keras.optimizers.get(self._optimizer)
         opt.learning_rate = self._learning_rate
-        self._model.compile(optimizer=opt, loss=self._loss)
+        self._model.compile(optimizer=opt, loss=self._loss, jit_compile=True)
 
     def fit(self, x, y, validation_split=0.2):
+        self._target = getattr(y, "name", None) or getattr(y, "columns", None)
+
         x_2d = np.asarray(x)
         y_arr = np.asarray(y)
 
@@ -69,10 +73,15 @@ class LSTMWrapper:
         )
         return self
 
-    def predict(self, x):
+    def predict(self, x, recursive=True):
+        if not recursive or len(x) <= 1:
+            return self._predict_raw(x)
+        return recursive_predict(self._predict_raw, x, target_name=self._target)
+
+    def _predict_raw(self, x):
         x_2d = np.asarray(x)
         x_3d = np.reshape(x_2d, (x_2d.shape[0], self._timesteps, -1))
-        return self._model.predict(x_3d, verbose=0).flatten()
+        return self._model(x_3d, training=False).numpy().flatten()
 
     def get_importance(self, x, evaluation_split=0.2, normalize=True):
         x_arr = np.asarray(x)
@@ -86,12 +95,13 @@ class LSTMWrapper:
         n_eval = max(1, min(n_samples - 1, n_eval))
         split_idx = n_samples - n_eval
 
-        bg_data = x_arr[:split_idx]
-        eval_data = x_arr[split_idx:]
+        bg_3d = np.reshape(x_arr[:split_idx], (split_idx, self._timesteps, -1))
+        eval_3d = np.reshape(x_arr[split_idx:], (n_eval, self._timesteps, -1))
 
-        explainer = shap.Explainer(self.predict, bg_data)
-        shap_values = explainer(eval_data)
-        importance = np.mean(np.abs(shap_values.values), axis=0)
+        explainer = shap.GradientExplainer(self._model, bg_3d)
+        shap_values = explainer.shap_values(eval_3d)
+        vals = shap_values.values if hasattr(shap_values, "values") else shap_values
+        importance = np.mean(np.abs(vals), axis=(0, 1)).flatten()
 
         if normalize and np.sum(importance) > 0:
             importance = importance / np.sum(importance)
