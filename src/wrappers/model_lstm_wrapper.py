@@ -51,7 +51,7 @@ class LSTMWrapper:
 
         opt = tf.keras.optimizers.get(self._optimizer)
         opt.learning_rate = self._learning_rate
-        self._model.compile(optimizer=opt, loss=self._loss, jit_compile=True)
+        self._model.compile(optimizer=opt, loss=self._loss, jit_compile=False)
 
     def fit(self, x, y, validation_split=0.2):
         self._target = getattr(y, "name", None) or getattr(y, "columns", None)

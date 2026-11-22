@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import os
 import sys
 import time
@@ -187,6 +188,7 @@ def run_optimization(df, features, target, model_name, model_wrapper, optimizer_
 
 
 def optimize_target(target):
+    configure_gpu()
     target_file = PROCESSED_DATA_DIR / f"dataset_final_{target.lower()}.csv"
 
     df_target = load_dataset(target_file)
@@ -217,12 +219,11 @@ def optimize_target(target):
 
 
 def main():
-    configure_gpu()
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=len(TARGETS)) as executor:
-        futures = []
-        for target in TARGETS:
-            futures.append(executor.submit(optimize_target, target))
+    multiprocessing.set_start_method("spawn", force=True)
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(optimize_target, target) for target in TARGETS]
 
         for future in concurrent.futures.as_completed(futures):
             try:
