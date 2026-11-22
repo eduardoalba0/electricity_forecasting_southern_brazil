@@ -30,7 +30,7 @@ class PSOWrapper(OptimizerBaseWrapper):
             seed=seed
         )
 
-        self._options = options if options is not None else {'c1': 0.5, 'c2': 0.5, 'w': 0.5}
+        self._options = options if options is not None else {'c1': 2.0, 'c2': 1.5, 'w': 0.7}
         self._bounds = bounds
         self._optimizer = None
         self._build_optimizer()
