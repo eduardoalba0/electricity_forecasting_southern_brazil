@@ -12,7 +12,7 @@ SHAP_DIR = RESULTS_DIR / "shap"
 PERFORMANCE_DIR = RESULTS_DIR / "performance"
 
 MAX_WORKERS = 20
-N_JOBS = 5
+N_JOBS = 1
 URL_ADS = "https://ads.atmosphere.copernicus.eu/api"
 URL_CDS = "https://cds.climate.copernicus.eu/api"
 
@@ -40,7 +40,7 @@ CONSUMERS_VARS = ["Residential Consumers", "Industrial Consumers", "Commercial C
 
 CONSUMERS_SLUG = ["residential", "commercial", "industrial", "other"]
 
-REQUIRED_VARS = [
+REQUIRED_FEATURES = [
     "State_PR",
     "State_RS",
     "State_SC",

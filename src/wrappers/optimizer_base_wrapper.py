@@ -1,11 +1,10 @@
 from pathlib import Path
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from joblib import delayed, Parallel
 from sklearn.model_selection import TimeSeriesSplit
 
-from utils.cache import _build_cache_key
+from utils.cache import build_cache_key
 from utils.constants import N_JOBS
 from utils.delayed_utils import eval_single_fold
 from utils.measures import rrmse
@@ -81,7 +80,7 @@ class OptimizerBaseWrapper:
         base_model = self._model_wrapper.from_array(model_arr, **self.fixed_params)
         model_params = base_model.to_dict()
 
-        key = _build_cache_key(model_params, features)
+        key = build_cache_key(model_params, features)
         if key in self._cache:
             cached_solution = self._cache[key].copy()
             cached_solution["threshold"] = threshold
@@ -131,6 +130,7 @@ class OptimizerBaseWrapper:
             **model_params,
             "threshold": threshold,
             "n_features": len(features),
+            "features": list(features)
         }
         self._cache[key] = solution_record
         self.solutions.append(solution_record.copy())

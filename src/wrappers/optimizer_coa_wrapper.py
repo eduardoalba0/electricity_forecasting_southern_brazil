@@ -6,7 +6,7 @@ from wrappers import OptimizerBaseWrapper
 
 class COAWrapper(OptimizerBaseWrapper):
     def __init__(self, dataset, features, target, model_name, model_wrapper,
-                 n_packs, n_coy, n_iter, bounds, path, feature_selection = False, feature_importances=None, fixed_params=None,
+                 n_packs, n_coy, n_iter, bounds, path, feature_selection = False, feature_importances=None, required_features=None, fixed_params=None,
                  n_splits=5, test_size=1, groupby_col=None, seed=42):
 
         n_solutions = n_packs * n_coy
@@ -15,13 +15,14 @@ class COAWrapper(OptimizerBaseWrapper):
             dataset=dataset,
             features=features,
             target=target,
-            model_name=model_name,
+            model_name="COA-"+model_name,
             model_wrapper=model_wrapper,
             n_solutions=n_solutions,
             n_iter=n_iter,
             path=path,
             feature_selection=feature_selection,
             feature_importances=feature_importances,
+            required_features=required_features,
             fixed_params=fixed_params,
             n_splits=n_splits,
             test_size=test_size,
