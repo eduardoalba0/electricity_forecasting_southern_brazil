@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.python.training import training
 
-from utils.constants import ACTIVATIONS
+from utils.constants import ACTIVATIONS, BATCH_SIZES
 from utils.dataset_manipulators import recursive_predict
 
 
@@ -48,7 +48,7 @@ class MLPWrapper:
             return
         self._model = Sequential([
             Input(shape=(self._inputs,)),
-            Dense(self._hidden_layers, activation=self._hidden_activation),
+            Dense(self._hidden_layers, activation=self._hidden_activation, use_bias=True),
             Dense(1, activation=self._output_activation)
         ])
         opt = tf.keras.optimizers.get(self._optimizer)
@@ -115,10 +115,12 @@ class MLPWrapper:
     @classmethod
     def from_array(cls, solution_arr, **fixed_params):
         act_idx = int(np.clip(round(solution_arr[3]), 0, len(ACTIVATIONS) - 1))
+        bth_idx = int(np.clip(round(solution_arr[2]), 0, len(BATCH_SIZES) - 1))
+
         return cls(
             hidden_layers=max(1, int(round(solution_arr[0]))),
             epochs=max(1, int(round(solution_arr[1]))),
-            batch_size=max(1, int(round(solution_arr[2]))),
+            batch_size=BATCH_SIZES[bth_idx],
             hidden_activation=ACTIVATIONS[act_idx],
             learning_rate=float(solution_arr[4]),
             **fixed_params

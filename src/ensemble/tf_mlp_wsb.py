@@ -50,7 +50,7 @@ class TensorMLPWSB(TensorWSBagging):
 
     def _build_model(self):
         ensemble_input = Input(shape=(self._inputs,), name="ensemble_input")
-        mlp_out = Dense(self._mlp_strong_hidden, activation=self._mlp_strong_activation, name='strong_mlp')(ensemble_input)
+        mlp_out = Dense(self._mlp_strong_hidden, activation=self._mlp_strong_activation, use_bias=True, name='strong_mlp')(ensemble_input)
         strong_out = Dense(1, activation='linear', name='strong_pred')(mlp_out)
 
         weak_outputs = []

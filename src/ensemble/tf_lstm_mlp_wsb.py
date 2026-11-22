@@ -52,7 +52,7 @@ class TensorLSTMMLPWSB(TensorWSBagging):
     def _build_model(self):
         ensemble_input = Input(shape=(self._inputs,), name="ensemble_input")
         reshaped_for_lstm = Reshape((self._timesteps, -1), name="reshape_lstm")(ensemble_input)
-        lstm_out = LSTM(self._lstm_units, activation=self._lstm_activation, name='strong_lstm')(reshaped_for_lstm)
+        lstm_out = LSTM(self._lstm_units, activation=self._lstm_activation, use_bias=True, name='strong_lstm')(reshaped_for_lstm)
 
         strong_out = Dense(1, activation='linear', name='strong_pred')(lstm_out)
         weak_outputs = []

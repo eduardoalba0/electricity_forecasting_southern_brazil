@@ -6,7 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
-from utils.constants import ACTIVATIONS
+from utils.constants import ACTIVATIONS, BATCH_SIZES
 from utils.dataset_manipulators import recursive_predict
 
 
@@ -45,7 +45,7 @@ class LSTMWrapper:
     def _build_model(self):
         self._model = Sequential([
             Input(shape=(self._timesteps, self._inputs)),
-            LSTM(self._units, activation=self._lstm_activation),
+            LSTM(self._units, activation=self._lstm_activation, use_bias=True),
             Dense(1, activation=self._output_activation)
         ])
 
@@ -119,10 +119,12 @@ class LSTMWrapper:
     @classmethod
     def from_array(cls, solution_arr, **fixed_params):
         act_idx = int(np.clip(round(solution_arr[3]), 0, len(ACTIVATIONS) - 1))
+        bth_idx = int(np.clip(round(solution_arr[2]), 0, len(BATCH_SIZES) - 1))
+
         return cls(
             units=max(1, int(round(solution_arr[0]))),
             epochs=max(1, int(round(solution_arr[1]))),
-            batch_size=max(1, int(round(solution_arr[2]))),
+            batch_size=BATCH_SIZES[bth_idx],
             lstm_activation=ACTIVATIONS[act_idx],
             learning_rate=float(solution_arr[4]),
             **fixed_params
