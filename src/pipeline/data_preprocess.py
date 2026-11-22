@@ -121,8 +121,6 @@ def preprocess_consumption_data(
 
 def main():
     raw_dir = RAW_DATA_DIR
-    output_filepath = os.path.join(PROCESSED_DATA_DIR, "dataset.csv")
-    output_cleaned_filepath = os.path.join(PROCESSED_DATA_DIR, "dataset_final.csv")
 
     consumption_path = os.path.join(raw_dir, "consumption", "consumption.csv")
     df_consumption = preprocess_consumption_data(consumption_path)
@@ -135,7 +133,6 @@ def main():
     df_merged = df_merged.sort_values(by=["State", "_dt"]).reset_index(drop=True)
 
     df_merged["Month"] = df_merged["_dt"].dt.month
-    df_merged["Year"] = df_merged["_dt"].dt.year
 
     states_included = df_merged["State"].unique().tolist()
     date_range = f"{df_merged['Date'].iloc[0]} to {df_merged['Date'].iloc[-1]}"
@@ -144,24 +141,19 @@ def main():
 
     state_dummies = pd.get_dummies(df_merged["State"], prefix="State", dtype=int)
     month_dummies = pd.get_dummies(df_merged["Month"], prefix="Month", dtype=int)
-    year_dummies = pd.get_dummies(df_merged["Year"], prefix="Year", dtype=int)
 
-    orig_vars = df_merged[["State", "Month", "Year"]]
-    df_features = df_merged.drop(columns=["State", "Month", "Year", "_dt"])
+    orig_vars = df_merged[["State", "Month"]]
+    df_features = df_merged.drop(columns=["State", "Month", "_dt"])
 
-    df_dataset = pd.concat([orig_vars, state_dummies, month_dummies, year_dummies, df_features], axis=1)
+    df_dataset = pd.concat([orig_vars, state_dummies, month_dummies, df_features], axis=1)
 
-    # Remove colunas com variância zero (constantes)
     zero_var_cols = [c for c in df_dataset.select_dtypes(include="number").columns if df_dataset[c].std() == 0]
     if zero_var_cols:
         df_dataset = df_dataset.drop(columns=zero_var_cols)
 
-    os.makedirs(os.path.dirname(os.path.abspath(output_filepath)), exist_ok=True)
-    df_dataset.to_csv(output_filepath, index=True)
-
     weather_prefixes = tuple(ERA5_VARS) + tuple(CAMS_VARS)
     numeric_cols = [
-        col for col in TARGETS + CONSUMERS_VARS + [
+        col for col in CONSUMERS_VARS + [
             c for c in df_dataset.columns if c.startswith(weather_prefixes)
         ]
         if col in df_dataset.columns
@@ -169,21 +161,33 @@ def main():
 
     df_cleaned = quantile_outlier_inputation(df_dataset, target=numeric_cols)
 
-    # Remove colunas que ficaram com variância zero após imputação/corte de outliers
     zero_var_cleaned = [c for c in df_cleaned.select_dtypes(include="number").columns if df_cleaned[c].std() == 0]
     if zero_var_cleaned:
         df_cleaned = df_cleaned.drop(columns=zero_var_cleaned)
 
-    df_cleaned = create_lags(df_cleaned, lag_col=TARGETS, n_lags=12, groupby_col="State")
-    df_cleaned = df_cleaned.drop(columns=["State", "Month", "Year"])
-    df_cleaned.to_csv(output_cleaned_filepath, index=True)
+    for target in TARGETS:
+        target_slug = target.lower()
+        consumer_col = f"{target} Consumers"
+        target_lag_cols = [c for c in [target, consumer_col] if c in df_cleaned.columns]
 
-    print(f"Preprocessed dataset saved to: {output_filepath}")
+        df_target = create_lags(df_cleaned, lag_col=target_lag_cols, n_lags=12, groupby_col="State")
+
+        other_targets = [t for t in TARGETS if t != target]
+        other_consumers = [c for c in CONSUMERS_VARS if c != consumer_col]
+        cols_to_drop = [c for c in other_targets + other_consumers + ["Month"] if c in df_target.columns]
+        df_target = df_target.drop(columns=cols_to_drop)
+
+        target_output_path = os.path.join(PROCESSED_DATA_DIR, f"dataset_{target_slug}.csv")
+        target_final_output_path = os.path.join(PROCESSED_DATA_DIR, f"dataset_final_{target_slug}.csv")
+
+        df_target.to_csv(target_output_path, index=True)
+        df_target.to_csv(target_final_output_path, index=True)
+        print(f"Dataset for {target} created with shape {df_target.shape} and saved to: {target_output_path}")
 
     print(f"Dataset successfully created with shape: {df_dataset.shape}")
     print(f"States included: {states_included}")
     print(f"Date range: {date_range}")
-    print(f"Total features: {len(df_dataset.columns)}")
+    print(f"Total features in base dataset: {len(df_dataset.columns)}")
 
 
 if __name__ == "__main__":
