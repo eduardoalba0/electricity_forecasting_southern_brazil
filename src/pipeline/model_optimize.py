@@ -90,9 +90,9 @@ def get_feature_importance(df, features, target):
         logger.info(f"  Computing SHAP for state {state} (samples={len(df_sample)})...")
         baseline = MLPWrapper(
             inputs=len(features),
-            hidden_layers=50,
-            epochs=20,
-            batch_size=64,
+            hidden_layers=100,
+            epochs=50,
+            batch_size=128,
         )
         baseline.fit(df_sample[features], df_sample[target])
         imp_state = baseline.get_importance(df_sample[features], evaluation_split=12, normalize=True)
