@@ -1,0 +1,485 @@
+feature,importance
+Mean sea level pressure_Q1_0900_sum,0.08039751439199307
+Surface pressure_Q4_2100_sum,0.06954180479125324
+Surface pressure_Q1_2100_sum,0.06460854168425889
+Surface pressure_Q4_0900_sum,0.062322084112810476
+Mean sea level pressure_Q1_1800_sum,0.05203066775231105
+Mean sea level pressure_Q2_0900_sum,0.0494997787138464
+Mean sea level pressure_Q3_2100_sum,0.04659094884849587
+Mean sea level pressure_Q3_0900_sum,0.04274322879596964
+Surface pressure_Q1_1800_sum,0.036957765570692504
+Mean sea level pressure_Q4_2100_sum,0.03680573483393057
+Surface pressure_Q3_2100_sum,0.0362212290566637
+Surface pressure_Q1_0900_sum,0.035938120339744084
+Mean sea level pressure_Q4_0900_sum,0.03312363378664244
+Surface pressure_Q3_1800_sum,0.030762803847918452
+Surface pressure_Q3_0900_sum,0.029342569565537116
+Mean sea level pressure_Q4_1800_sum,0.02751015725397153
+Surface pressure_Q2_2100_sum,0.02528368621813465
+Surface pressure_Q4_1800_sum,0.02401420059169396
+Mean sea level pressure_Q2_1800_sum,0.023323509971055433
+Mean sea level pressure_Q3_1800_sum,0.020916789530049537
+Mean sea level pressure_Q1_2100_sum,0.02085048528721888
+Surface pressure_Q2_0900_sum,0.016645203071831503
+Surface pressure_Q2_1800_sum,0.014855518212114035
+Residential Consumers_LAG_07,0.010629303527073483
+Residential Consumers_LAG_12,0.010607038596055588
+Residential Consumers,0.008870256998404671
+Residential Consumers_LAG_10,0.00853620114757428
+Residential Consumers_LAG_08,0.00830236202346981
+Mean sea level pressure_Q2_2100_sum,0.008149256960418018
+Residential Consumers_LAG_02,0.008035281286007626
+Residential Consumers_LAG_03,0.007978099865379144
+Residential Consumers_LAG_05,0.0073746179775049285
+Residential Consumers_LAG_06,0.005531687628433232
+Residential Consumers_LAG_01,0.004918791734121412
+Residential Consumers_LAG_11,0.004435331568624639
+Residential Consumers_LAG_04,0.004158779673370028
+Residential_LAG_02,0.003066130046151714
+Residential_LAG_03,0.0030601703088751833
+Residential Consumers_LAG_09,0.0023396629402876257
+Residential_LAG_06,0.001998859038070586
+Residential_LAG_08,0.0014806453776886029
+Residential_LAG_01,0.0014721492936901474
+Residential_LAG_05,0.0012817604843284008
+Residential_LAG_04,0.0012336200920781573
+Residential_LAG_09,0.001232454231857794
+Residential_LAG_07,0.0012088848275225487
+Residential_LAG_11,0.0011992108368278865
+Residential_LAG_10,0.0011891713292667184
+Residential_LAG_12,0.0008961822400456301
+2 metre dewpoint temperature_Q4_2100_sum,3.169317342509874e-05
+2 metre dewpoint temperature_Q4_1800_sum,3.090486331457605e-05
+2 metre dewpoint temperature_Q2_1800_sum,2.695697715264308e-05
+2 metre temperature_Q2_2100_sum,1.967743706307446e-05
+2 metre temperature_Q3_2100_sum,1.7051379977549164e-05
+2 metre temperature_Q4_0900_sum,1.6860239536240708e-05
+2 metre dewpoint temperature_Q3_0900_sum,1.526019404725693e-05
+2 metre dewpoint temperature_Q2_0900_sum,1.3136226678855708e-05
+2 metre temperature_Q2_0900_sum,1.3096820576366567e-05
+2 metre dewpoint temperature_Q2_2100_sum,1.3025728987751848e-05
+2 metre dewpoint temperature_Q3_1800_sum,1.2719811198963807e-05
+2 metre temperature_Q1_0900_sum,1.23220951925459e-05
+2 metre temperature_Q2_1800_sum,1.209218305443373e-05
+2 metre dewpoint temperature_Q1_2100_sum,1.1873923069491694e-05
+2 metre temperature_Q4_1800_sum,1.1752286866496105e-05
+2 metre dewpoint temperature_Q3_2100_sum,1.1456726938527621e-05
+2 metre temperature_Q1_1800_sum,1.1212395745473191e-05
+2 metre dewpoint temperature_Q1_0900_sum,1.096187871592011e-05
+2 metre dewpoint temperature_Q4_0900_sum,9.191444190821961e-06
+2 metre dewpoint temperature_Q1_1800_sum,7.809942495707516e-06
+2 metre temperature_Q1_2100_sum,7.71299574574526e-06
+2 metre temperature_Q3_0900_sum,5.584746520404299e-06
+2 metre temperature_Q4_2100_sum,4.553674351037975e-06
+Mean sea level pressure_Q4_0900_min,4.487805682677702e-06
+Mean sea level pressure_Q4_2100_max,4.341525621005678e-06
+Mean sea level pressure_Q1_2100_min,4.310434080798312e-06
+Mean sea level pressure_Q1_2100_max,3.850423088879696e-06
+Surface pressure_Q2_2100_max,3.7187644784846777e-06
+Surface pressure_Q4_1800_mean,3.621404767033524e-06
+Mean sea level pressure_Q4_0900_mean,3.6144714030383524e-06
+Mean sea level pressure_Q1_0900_min,3.614186172311668e-06
+Total cloud cover_Q4_1800_sum,3.323213696937794e-06
+Total cloud cover_Q2_0900_sum,3.300907023928472e-06
+Mean sea level pressure_Q4_1800_max,3.1855766878486803e-06
+Surface pressure_Q4_2100_max,3.0144819399332943e-06
+Surface pressure_Q3_2100_mean,2.9923837281246377e-06
+Surface pressure_Q3_2100_min,2.9858151124224548e-06
+Total cloud cover_Q4_2100_sum,2.932067433849573e-06
+Surface pressure_Q1_2100_min,2.9220446856934256e-06
+Mean sea level pressure_Q2_1800_min,2.91484570772866e-06
+Mean sea level pressure_Q2_0900_mean,2.8440476944789694e-06
+Mean sea level pressure_Q2_2100_mean,2.818418501753327e-06
+Surface pressure_Q2_0900_min,2.8063734448750208e-06
+Surface pressure_Q2_1800_max,2.7615074759132483e-06
+Surface pressure_Q1_2100_max,2.6857545648155387e-06
+Mean sea level pressure_Q3_0900_mean,2.6730948790986277e-06
+Surface pressure_Q3_1800_max,2.513462102484918e-06
+Total cloud cover_Q2_1800_sum,2.5108742805416698e-06
+Surface pressure_Q1_1800_max,2.4911768399401167e-06
+Mean sea level pressure_Q1_2100_mean,2.4451395370530914e-06
+Mean sea level pressure_Q2_1800_mean,2.4250980790316127e-06
+Mean sea level pressure_Q3_0900_min,2.408011603025378e-06
+Surface pressure_Q1_1800_mean,2.3286541105485813e-06
+Surface pressure_Q2_1800_min,2.323095181454525e-06
+Surface pressure_Q3_1800_min,2.317562302446463e-06
+Total cloud cover_Q1_0900_sum,2.298396342169156e-06
+Surface pressure_Q3_2100_max,2.2593150357758302e-06
+Surface pressure_Q1_0900_mean,2.2236383323426997e-06
+Surface pressure_Q3_0900_max,2.2109375628337726e-06
+Surface pressure_Q2_2100_min,2.1845878357469084e-06
+Mean sea level pressure_Q2_0900_min,2.030731525460508e-06
+Surface pressure_Q4_0900_min,2.0016119152788947e-06
+Mean sea level pressure_Q3_2100_min,1.959333720223411e-06
+Mean sea level pressure_Q4_1800_mean,1.9330009607496886e-06
+Mean sea level pressure_Q2_2100_max,1.921255725674764e-06
+Mean sea level pressure_Q1_1800_max,1.8514460727234562e-06
+Mean sea level pressure_Q3_2100_max,1.8071206894338266e-06
+Mean sea level pressure_Q4_2100_min,1.8063857899507142e-06
+Total cloud cover_Q2_2100_sum,1.8016652056792035e-06
+Total cloud cover_Q4_0900_sum,1.7911439557606502e-06
+Total cloud cover_Q3_2100_sum,1.7435815809006004e-06
+Surface pressure_Q3_0900_min,1.7423093813575615e-06
+Mean sea level pressure_Q2_2100_min,1.7409689744400252e-06
+Mean sea level pressure_Q1_1800_min,1.7274075826608623e-06
+Mean sea level pressure_Q2_1800_max,1.7239209869077002e-06
+Mean sea level pressure_Q1_0900_max,1.5714359815130666e-06
+Mean sea level pressure_Q3_2100_std,1.5500721310939626e-06
+Mean sea level pressure_Q1_0900_mean,1.4819281405024042e-06
+Mean sea level pressure_Q4_0900_max,1.4764106610268403e-06
+Mean sea level pressure_Q1_1800_mean,1.4447650787560132e-06
+Surface pressure_Q4_2100_min,1.435436964610557e-06
+Surface pressure_Q4_1800_max,1.4226163993617835e-06
+10 metre U wind component_Q4_1800_sum,1.4096756313613752e-06
+Surface pressure_Q2_0900_max,1.4086819371439274e-06
+10 metre U wind component_Q2_0900_sum,1.3981229190531317e-06
+Mean sea level pressure_Q4_0900_std,1.3600156460793849e-06
+Surface pressure_Q3_1800_mean,1.3368122937384629e-06
+Mean sea level pressure_Q3_1800_mean,1.3056028733228631e-06
+Mean sea level pressure_Q2_0900_max,1.2988255838448037e-06
+Mean sea level pressure_Q3_2100_mean,1.2618752272665587e-06
+Total cloud cover_Q3_1800_sum,1.2465514514639293e-06
+Mean sea level pressure_Q3_1800_min,1.2465369321429317e-06
+2 metre temperature_Q3_1800_sum,1.2181139840282354e-06
+Surface pressure_Q4_2100_mean,1.170316662329436e-06
+10 metre U wind component_Q4_0900_sum,1.133912586207516e-06
+Mean sea level pressure_Q3_1800_std,1.1153840829008219e-06
+Surface pressure_Q1_2100_mean,1.0674093494717619e-06
+Surface pressure_Q1_0900_min,1.054095652832591e-06
+Mean sea level pressure_Q3_1800_max,1.0534772522629866e-06
+Surface pressure_Q2_2100_mean,1.0493601208614762e-06
+10 metre U wind component_Q2_1800_sum,1.0476673158407514e-06
+Surface pressure_Q4_0900_max,1.0142047498043424e-06
+Total cloud cover_Q1_2100_sum,1.0065585419037218e-06
+Surface pressure_Q4_1800_min,9.902942799900303e-07
+Surface pressure_Q2_0900_mean,9.826738279755015e-07
+10 metre U wind component_Q1_1800_sum,9.578634738597951e-07
+Surface pressure_Q4_0900_mean,9.314254561408015e-07
+Mean sea level pressure_Q4_2100_mean,9.237281647983759e-07
+10 metre V wind component_Q2_1800_sum,9.014641480069103e-07
+Mean sea level pressure_Q4_1800_std,8.883276156191134e-07
+Surface pressure_Q1_1800_min,8.779938137386756e-07
+Mean sea level pressure_Q3_0900_max,8.630501864897906e-07
+10 metre V wind component_Q3_2100_sum,8.304876890313613e-07
+Total cloud cover_Q3_0900_sum,8.260691692181768e-07
+Mean sea level pressure_Q2_1800_std,7.421576401064593e-07
+Surface pressure_Q1_0900_max,7.10266628824541e-07
+10 metre V wind component_Q3_1800_sum,6.84711553473634e-07
+Mean sea level pressure_Q1_2100_std,6.65410004753536e-07
+10 metre U wind component_Q4_2100_sum,6.567169483343556e-07
+Mean sea level pressure_Q4_2100_std,6.189656633261853e-07
+10 metre V wind component_Q2_2100_sum,6.06226203772897e-07
+Total cloud cover_Q1_1800_sum,5.912258755017966e-07
+10 metre U wind component_Q3_1800_sum,5.863146033345697e-07
+Surface pressure_Q2_1800_mean,5.749996571359953e-07
+Surface pressure_Q3_0900_mean,5.714216236280557e-07
+10 metre V wind component_Q3_0900_sum,5.701071179117269e-07
+10 metre V wind component_Q1_0900_sum,5.377368831053668e-07
+10 metre V wind component_Q1_1800_sum,5.268786883866314e-07
+10 metre U wind component_Q3_2100_sum,5.091388817173312e-07
+Mean sea level pressure_Q2_0900_std,5.013282374623612e-07
+10 metre V wind component_Q1_2100_sum,4.5817109554600144e-07
+10 metre U wind component_Q3_0900_sum,4.466265874119931e-07
+10 metre V wind component_Q4_2100_sum,4.4211143431773846e-07
+Surface pressure_Q2_2100_std,4.1725279970664936e-07
+Mean sea level pressure_Q3_0900_std,4.0890667586702884e-07
+Surface pressure_Q4_1800_std,3.8453705648665223e-07
+10 metre V wind component_Q2_0900_sum,3.713079058120237e-07
+Surface pressure_Q3_2100_std,3.6439297172739285e-07
+Mean sea level pressure_Q1_0900_std,3.600969479663123e-07
+10 metre U wind component_Q1_2100_sum,3.4840203411403725e-07
+10 metre U wind component_Q2_2100_sum,3.3721529442395e-07
+10 metre U wind component_Q1_0900_sum,3.304748918968761e-07
+10 metre V wind component_Q4_0900_sum,3.086392327947453e-07
+Surface pressure_Q4_0900_std,2.8920599242138873e-07
+Mean sea level pressure_Q4_1800_min,2.8461989718196614e-07
+Mean sea level pressure_Q1_1800_std,2.6683594886820474e-07
+Surface pressure_Q3_1800_std,2.589063112427331e-07
+Surface pressure_Q3_0900_std,2.406965682487885e-07
+10 metre V wind component_Q4_1800_sum,2.3353645404887543e-07
+Surface pressure_Q1_2100_std,2.298363368139652e-07
+Surface pressure_Q1_0900_std,2.146157594115859e-07
+Mean sea level pressure_Q2_2100_std,1.7359964770188563e-07
+Surface pressure_Q1_1800_std,1.675437141313614e-07
+Surface pressure_Q4_2100_std,1.6025157818930403e-07
+Surface pressure_Q2_1800_std,1.2992971721895807e-07
+2 metre dewpoint temperature_Q3_1800_min,4.0364196895853736e-08
+2 metre temperature_Q1_2100_max,4.0054614802618715e-08
+2 metre dewpoint temperature_Q1_0900_mean,3.9011856480493216e-08
+2 metre temperature_Q4_0900_min,3.5833035995572875e-08
+2 metre dewpoint temperature_Q4_0900_min,3.5693223977671754e-08
+2 metre dewpoint temperature_Q1_1800_mean,3.3495245997044334e-08
+2 metre temperature_Q1_1800_max,3.210483806052456e-08
+2 metre dewpoint temperature_Q1_0900_min,3.207319017233577e-08
+2 metre dewpoint temperature_Q2_0900_min,3.18803513274607e-08
+2 metre temperature_Q4_1800_min,3.149436871946602e-08
+2 metre temperature_Q2_2100_mean,3.1478768647770894e-08
+2 metre temperature_Q2_0900_min,3.1063227971401684e-08
+2 metre temperature_Q2_1800_min,3.0799868779228385e-08
+2 metre temperature_Q4_0900_mean,3.0789322546111134e-08
+2 metre dewpoint temperature_Q2_2100_mean,3.059165271401328e-08
+2 metre temperature_Q1_1800_mean,3.002913295778921e-08
+2 metre temperature_Q3_1800_min,2.990832897385768e-08
+2 metre temperature_Q4_2100_min,2.930534234773383e-08
+2 metre dewpoint temperature_Q3_2100_max,2.7982145245326045e-08
+Surface pressure_Q2_0900_std,2.7920112090838712e-08
+2 metre temperature_Q1_0900_mean,2.7707410499785186e-08
+2 metre dewpoint temperature_Q4_2100_mean,2.7022857793441954e-08
+2 metre temperature_Q2_2100_min,2.683100536129378e-08
+2 metre temperature_Q1_2100_mean,2.647119273053223e-08
+2 metre temperature_Q3_2100_min,2.6416557417473167e-08
+2 metre temperature_Q3_2100_max,2.6109250551846004e-08
+2 metre dewpoint temperature_Q4_0900_mean,2.5178799067917258e-08
+2 metre temperature_Q3_0900_max,2.4999427379672164e-08
+2 metre dewpoint temperature_Q3_1800_max,2.3999048645125443e-08
+2 metre temperature_Q4_2100_mean,2.167155374447006e-08
+2 metre temperature_Q3_0900_min,2.1261448040573594e-08
+2 metre dewpoint temperature_Q2_0900_max,2.1091649686821878e-08
+2 metre dewpoint temperature_Q2_2100_min,2.0568004087164058e-08
+2 metre temperature_Q3_2100_mean,1.9728001971735358e-08
+2 metre temperature_Q1_0900_max,1.9171433177535517e-08
+2 metre dewpoint temperature_Q4_2100_min,1.9125249815698155e-08
+2 metre dewpoint temperature_Q1_2100_min,1.9089654475507806e-08
+2 metre dewpoint temperature_Q1_1800_min,1.8920909385041086e-08
+2 metre dewpoint temperature_Q2_1800_min,1.8899803617932995e-08
+10 metre U wind component_Q3_1800_max,1.8854810427506635e-08
+2 metre temperature_Q2_1800_mean,1.859335660128968e-08
+2 metre temperature_Q2_0900_max,1.82826146577116e-08
+10 metre U wind component_Q3_0900_max,1.8239533236850804e-08
+2 metre dewpoint temperature_Q3_2100_min,1.749646284587452e-08
+2 metre dewpoint temperature_Q1_2100_mean,1.6653827481851946e-08
+2 metre temperature_Q2_2100_max,1.655301507328091e-08
+2 metre temperature_Q1_2100_min,1.6478881831718264e-08
+10 metre U wind component_Q4_0900_max,1.6469429831029128e-08
+2 metre temperature_Q3_1800_max,1.5840222362217377e-08
+2 metre temperature_Q3_0900_mean,1.5650204393798343e-08
+2 metre dewpoint temperature_Q3_0900_max,1.5598387162199076e-08
+2 metre dewpoint temperature_Q3_0900_min,1.5454988124880487e-08
+2 metre dewpoint temperature_Q2_1800_max,1.5142237617073667e-08
+2 metre dewpoint temperature_Q4_0900_max,1.4516738433771845e-08
+2 metre temperature_Q4_2100_max,1.4206563585327706e-08
+10 metre U wind component_Q1_0900_max,1.4108397037754113e-08
+10 metre U wind component_Q2_0900_max,1.3840739216163314e-08
+10 metre V wind component_Q1_1800_min,1.3507716161835466e-08
+2 metre dewpoint temperature_Q4_1800_max,1.3221152895186062e-08
+10 metre U wind component_Q2_2100_max,1.2502051790095376e-08
+10 metre V wind component_Q4_2100_max,1.2124956693828833e-08
+2 metre dewpoint temperature_Q1_1800_max,1.1825883904326481e-08
+2 metre temperature_Q4_1800_mean,1.1163293454961951e-08
+2 metre temperature_Q1_0900_min,1.0875978029567059e-08
+2 metre dewpoint temperature_Q1_2100_max,1.0645738662659634e-08
+2 metre dewpoint temperature_Q3_2100_mean,1.052962757484143e-08
+10 metre V wind component_Q2_1800_min,1.018653484861516e-08
+10 metre U wind component_Q1_1800_max,1.0136758229327661e-08
+10 metre V wind component_Q4_1800_min,1.0040350125919925e-08
+10 metre U wind component_Q2_1800_max,1.0016611011716704e-08
+10 metre V wind component_Q4_0900_max,9.834066263592936e-09
+2 metre temperature_Q1_1800_min,9.133670988892295e-09
+2 metre dewpoint temperature_Q2_1800_mean,9.066688020476002e-09
+2 metre dewpoint temperature_Q3_0900_mean,8.91700363038001e-09
+10 metre V wind component_Q1_0900_max,8.831242325780946e-09
+10 metre U wind component_Q2_1800_min,8.761710526117342e-09
+2 metre temperature_Q2_1800_max,8.639955397749245e-09
+2 metre temperature_Q2_0900_mean,8.35784482101714e-09
+10 metre U wind component_Q3_2100_min,8.29594768151368e-09
+2 metre dewpoint temperature_Q4_2100_max,8.229276782431196e-09
+2 metre temperature_Q1_1800_std,7.796203988373346e-09
+10 metre V wind component_Q3_0900_max,7.769421849247017e-09
+10 metre U wind component_Q4_1800_max,7.737913836506968e-09
+2 metre temperature_Q3_1800_std,7.734709532168958e-09
+10 metre V wind component_Q1_2100_min,7.694275461611419e-09
+10 metre U wind component_Q4_0900_min,7.621117972920418e-09
+2 metre dewpoint temperature_Q3_1800_std,7.562793484267844e-09
+2 metre dewpoint temperature_Q4_1800_mean,7.478178062614953e-09
+2 metre temperature_Q2_0900_std,7.469177881354213e-09
+2 metre dewpoint temperature_Q3_0900_std,7.295201134005013e-09
+10 metre V wind component_Q2_1800_max,7.124133246300953e-09
+10 metre V wind component_Q3_2100_min,7.113234766265045e-09
+2 metre dewpoint temperature_Q3_1800_mean,7.0889455774957845e-09
+2 metre dewpoint temperature_Q4_1800_min,7.040472535270892e-09
+10 metre V wind component_Q2_2100_max,7.036256860363114e-09
+2 metre dewpoint temperature_Q4_0900_std,6.8491315466851e-09
+10 metre V wind component_Q1_2100_max,6.79290287927579e-09
+10 metre U wind component_Q1_0900_min,6.680082550438749e-09
+2 metre dewpoint temperature_Q2_0900_std,6.56978015568345e-09
+10 metre U wind component_Q3_2100_mean,6.533728265970449e-09
+10 metre V wind component_Q1_0900_min,6.5154715292274605e-09
+2 metre temperature_Q4_0900_std,6.454031155374979e-09
+2 metre temperature_Q4_1800_max,6.3867331566032965e-09
+2 metre temperature_Q4_0900_max,6.336706797456199e-09
+10 metre U wind component_Q3_2100_max,6.2979101963979914e-09
+10 metre V wind component_Q2_0900_max,6.283473426357928e-09
+10 metre V wind component_Q4_2100_min,6.280876362295504e-09
+10 metre V wind component_Q2_0900_min,6.211489686534472e-09
+10 metre U wind component_Q1_2100_max,6.141507003885539e-09
+2 metre temperature_Q1_2100_std,6.089967632477166e-09
+2 metre temperature_Q2_1800_std,5.9167148351075315e-09
+10 metre V wind component_Q3_1800_std,5.7844252571138465e-09
+10 metre V wind component_Q4_2100_mean,5.708890659922256e-09
+2 metre dewpoint temperature_Q4_1800_std,5.587205601593591e-09
+10 metre V wind component_Q1_1800_max,5.398955114214451e-09
+2 metre dewpoint temperature_Q2_2100_max,5.358478756576292e-09
+10 metre V wind component_Q3_0900_min,5.351458515147909e-09
+10 metre V wind component_Q1_2100_mean,5.347618179073962e-09
+10 metre V wind component_Q2_2100_min,5.343134216728882e-09
+10 metre V wind component_Q3_1800_min,5.038769466260714e-09
+2 metre dewpoint temperature_Q4_2100_std,4.998871756188087e-09
+10 metre U wind component_Q2_2100_min,4.969397107589678e-09
+2 metre temperature_Q4_2100_std,4.819330570531575e-09
+2 metre temperature_Q4_1800_std,4.725800585466353e-09
+10 metre V wind component_Q3_1800_max,4.708877088429006e-09
+10 metre U wind component_Q4_1800_min,4.434986073485284e-09
+10 metre U wind component_Q4_1800_mean,4.399373671538804e-09
+10 metre U wind component_Q1_1800_min,4.36662316966913e-09
+2 metre dewpoint temperature_Q1_0900_std,4.315578595980469e-09
+Total precipitation_Q2_2100_sum,4.184165003991324e-09
+10 metre V wind component_Q3_2100_mean,4.085950786896509e-09
+10 metre V wind component_Q2_1800_mean,4.0682751824327745e-09
+10 metre U wind component_Q2_1800_std,3.99908048849697e-09
+2 metre dewpoint temperature_Q2_2100_std,3.865425447961839e-09
+2 metre dewpoint temperature_Q2_0900_mean,3.814293523092616e-09
+10 metre V wind component_Q1_0900_std,3.78782292903417e-09
+10 metre U wind component_Q4_2100_max,3.764597961195251e-09
+2 metre temperature_Q2_2100_std,3.715202291256741e-09
+10 metre V wind component_Q4_1800_mean,3.6155221303122604e-09
+10 metre U wind component_Q1_1800_mean,3.5863230431696295e-09
+Total precipitation_Q1_2100_sum,3.5418706462841265e-09
+Total precipitation_Q2_1800_sum,3.3676452687551853e-09
+10 metre V wind component_Q1_0900_mean,3.3214487117592177e-09
+2 metre dewpoint temperature_Q1_2100_std,3.241120008596656e-09
+Total precipitation_Q4_2100_sum,3.2144885916961163e-09
+2 metre dewpoint temperature_Q1_1800_std,3.0484352673063584e-09
+10 metre V wind component_Q3_2100_max,3.0263508330245158e-09
+Total precipitation_Q3_1800_sum,3.024653100727945e-09
+10 metre U wind component_Q1_1800_std,2.890408093353275e-09
+2 metre temperature_Q3_0900_std,2.8568603452062072e-09
+10 metre V wind component_Q2_2100_mean,2.853235496895977e-09
+10 metre U wind component_Q2_1800_mean,2.8406894684143175e-09
+Total precipitation_Q1_1800_sum,2.7952081615232485e-09
+10 metre U wind component_Q3_0900_min,2.7824409240846056e-09
+Total precipitation_Q4_1800_sum,2.735949423341675e-09
+10 metre U wind component_Q4_2100_mean,2.715925876906082e-09
+10 metre U wind component_Q4_2100_std,2.6435370568699662e-09
+10 metre U wind component_Q3_2100_std,2.6010658782183347e-09
+10 metre U wind component_Q3_1800_mean,2.59328480124343e-09
+10 metre U wind component_Q4_0900_mean,2.5843103939932694e-09
+10 metre V wind component_Q4_1800_max,2.583136195554433e-09
+10 metre U wind component_Q2_2100_mean,2.570137058049787e-09
+10 metre U wind component_Q3_1800_std,2.5651319323418988e-09
+2 metre temperature_Q3_2100_std,2.463780873736271e-09
+2 metre temperature_Q3_1800_mean,2.4301933207123495e-09
+2 metre temperature_Q1_0900_std,2.3767683487275643e-09
+10 metre V wind component_Q4_2100_std,2.3469788281734992e-09
+10 metre V wind component_Q3_1800_mean,2.2852876740362533e-09
+Month_9,2.2643000187845824e-09
+10 metre V wind component_Q3_0900_mean,2.222283576193036e-09
+10 metre V wind component_Q1_1800_std,2.1865363826333793e-09
+10 metre V wind component_Q1_1800_mean,2.1817249374353822e-09
+Total precipitation_Q3_0900_sum,2.170911923097593e-09
+10 metre V wind component_Q4_0900_min,2.148681726332567e-09
+Total precipitation_Q1_0900_sum,2.1297275466663375e-09
+10 metre V wind component_Q2_1800_std,2.117599332320627e-09
+10 metre V wind component_Q2_0900_mean,2.1070661000881963e-09
+2 metre dewpoint temperature_Q2_1800_std,2.093283042998561e-09
+10 metre U wind component_Q2_0900_mean,2.0889196989103225e-09
+10 metre U wind component_Q3_1800_min,2.0667965561147045e-09
+10 metre U wind component_Q1_0900_mean,2.054893579314568e-09
+2 metre dewpoint temperature_Q3_2100_std,2.0148359134360928e-09
+Month_6,1.9998476977947484e-09
+10 metre V wind component_Q4_0900_std,1.9771544892719316e-09
+10 metre U wind component_Q1_2100_min,1.9371559458820822e-09
+10 metre V wind component_Q3_0900_std,1.9054040035013617e-09
+10 metre U wind component_Q1_0900_std,1.8928785604339034e-09
+10 metre V wind component_Q2_2100_std,1.8753023586330887e-09
+10 metre V wind component_Q3_2100_std,1.8111814540801074e-09
+Month_8,1.759166499024039e-09
+10 metre V wind component_Q1_2100_std,1.7459639039687617e-09
+10 metre U wind component_Q4_1800_std,1.6368140730754954e-09
+10 metre U wind component_Q4_0900_std,1.614267300178586e-09
+10 metre V wind component_Q2_0900_std,1.6105200571701905e-09
+Total cloud cover_Q3_2100_mean,1.5940565672990371e-09
+10 metre V wind component_Q4_1800_std,1.5106305831155643e-09
+10 metre V wind component_Q4_0900_mean,1.508532585742472e-09
+Month_4,1.4742971093135219e-09
+10 metre U wind component_Q1_2100_mean,1.4562314951277946e-09
+10 metre U wind component_Q3_0900_mean,1.4025617460093773e-09
+Total precipitation_Q3_2100_sum,1.3783298222454632e-09
+Month_12,1.2203685170882612e-09
+Month_3,1.115755176059206e-09
+Month_7,1.0725961034492232e-09
+Month_1,1.065022173966034e-09
+Month_5,9.997894927928398e-10
+10 metre U wind component_Q2_2100_std,9.897909023383395e-10
+Total precipitation_Q2_0900_sum,9.568389730557691e-10
+10 metre U wind component_Q1_2100_std,9.36355065334755e-10
+Total cloud cover_Q2_2100_mean,9.243006170732962e-10
+Total cloud cover_Q1_1800_mean,9.064262746110674e-10
+10 metre U wind component_Q4_2100_min,8.884663789030161e-10
+Total cloud cover_Q1_0900_mean,8.770564344172995e-10
+Total cloud cover_Q4_2100_mean,8.01103047235634e-10
+Total cloud cover_Q4_1800_mean,7.898755423769999e-10
+Total cloud cover_Q4_0900_mean,7.571652436251311e-10
+Month_2,7.506563172306365e-10
+10 metre U wind component_Q2_0900_std,7.334137876297289e-10
+Total cloud cover_Q2_0900_mean,7.308295445263283e-10
+10 metre U wind component_Q3_0900_std,7.004787988013447e-10
+2 metre dewpoint temperature_Q1_0900_max,6.629132135045568e-10
+Total precipitation_Q4_0900_sum,6.028122501737512e-10
+Total cloud cover_Q2_2100_std,5.476726830822523e-10
+Month_11,5.415034105117914e-10
+Total cloud cover_Q2_0900_std,4.921095639224351e-10
+10 metre U wind component_Q2_0900_min,4.869076432846805e-10
+Total cloud cover_Q3_1800_mean,3.9897041674014937e-10
+Total cloud cover_Q3_1800_std,3.4109713077318244e-10
+Total cloud cover_Q4_1800_std,2.8859560903396115e-10
+Total cloud cover_Q1_2100_mean,2.739781799088172e-10
+Total cloud cover_Q4_2100_std,2.6445484277994854e-10
+Total cloud cover_Q4_0900_std,2.6184439547537406e-10
+Month_10,2.4572855796970564e-10
+Total cloud cover_Q3_2100_std,2.261606984159372e-10
+Total cloud cover_Q3_0900_mean,2.0829405955688018e-10
+Total cloud cover_Q2_1800_mean,2.0409585856405715e-10
+Total cloud cover_Q1_0900_std,2.0314595347128608e-10
+Total cloud cover_Q1_2100_std,2.0044041863442228e-10
+Total cloud cover_Q1_1800_std,1.6424889759102823e-10
+Total cloud cover_Q3_0900_std,1.3282265797496968e-10
+Total cloud cover_Q2_1800_std,1.2627792627633926e-10
+Total precipitation_Q1_1800_max,3.680404719086896e-11
+Total precipitation_Q4_2100_max,3.514658486467942e-11
+Total precipitation_Q3_0900_max,3.272475342098307e-11
+Total precipitation_Q1_2100_max,3.174121876998399e-11
+Total precipitation_Q2_0900_max,2.054819635050216e-11
+Total precipitation_Q3_1800_max,1.979295852390786e-11
+Total precipitation_Q4_1800_max,1.867680303869919e-11
+Total precipitation_Q2_2100_max,1.7581404585150924e-11
+Total precipitation_Q2_1800_max,1.702782678686314e-11
+Total precipitation_Q3_2100_max,1.4543176649829639e-11
+Total precipitation_Q4_0900_max,1.4020265946396403e-11
+Total precipitation_Q1_0900_max,1.1764518466161851e-11
+Total precipitation_Q4_1800_std,4.829410968058403e-12
+Total precipitation_Q3_1800_std,3.937088997235979e-12
+Total precipitation_Q4_1800_mean,3.5928132571394926e-12
+Total precipitation_Q3_0900_std,3.284745150484618e-12
+Total precipitation_Q1_1800_std,3.0917232134195812e-12
+Total precipitation_Q1_0900_std,2.5858126629232065e-12
+Total precipitation_Q3_2100_std,2.295764849685112e-12
+Total precipitation_Q4_0900_std,2.1619412497279185e-12
+Total precipitation_Q2_2100_std,1.822757723322927e-12
+Total precipitation_Q2_1800_mean,1.7865429513192332e-12
+Total precipitation_Q2_0900_std,1.7235860671869993e-12
+Total precipitation_Q4_2100_std,1.6554632807668819e-12
+Total precipitation_Q1_2100_std,1.5267297169239022e-12
+Total precipitation_Q2_1800_std,1.4138535602807862e-12
+Total precipitation_Q1_1800_mean,1.2434433634208335e-12
+Total precipitation_Q4_2100_mean,1.0414770074423193e-12
+Total precipitation_Q1_0900_mean,9.791009241513247e-13
+Total precipitation_Q3_1800_mean,7.938203204822551e-13
+Total precipitation_Q1_2100_mean,7.599872429614069e-13
+Total precipitation_Q2_0900_mean,7.312003731565187e-13
+Total precipitation_Q3_2100_mean,6.522661048972387e-13
+Total precipitation_Q4_0900_mean,5.180715603643144e-13
+Total precipitation_Q3_0900_mean,5.005893683657973e-13
+Total precipitation_Q2_2100_mean,3.7560729031900856e-13
+State_PR,0.0
+State_RS,0.0
+State_SC,0.0

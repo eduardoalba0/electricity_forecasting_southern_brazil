@@ -1,11 +1,10 @@
-import concurrent.futures
 import logging
-import multiprocessing
 import os
 import sys
 import time
 import warnings
 import random
+import concurrent.futures
 from pathlib import Path
 
 import numpy as np
@@ -17,21 +16,27 @@ from utils.constants import (
     FEATURE_THRESHOLD_BOUND,
     HYPERPARAMS_DIR,
     PROCESSED_DATA_DIR,
-    TARGETS, SEEDS, get_models, OPTIMIZERS, MAX_WORKERS,
+    TARGETS, SEEDS, get_models, OPTIMIZERS, REQUIRED_FEATURES,
 )
 from wrappers import COAWrapper, MLPWrapper, PSOWrapper
 
 warnings.filterwarnings('ignore')
 
-
-def reset_seed(rnd_seed):
-    os.environ["PYTHONHASHSEED"] = str(rnd_seed)
+def reset_seed(rnd_seed = 42):
+    tf.keras.backend.clear_session()
     random.seed(rnd_seed)
     np.random.seed(rnd_seed)
+    tf.random.set_seed(rnd_seed)
     tf.keras.utils.set_random_seed(rnd_seed)
 
-N_ITER = 20
-N_SOLUTIONS = 50
+
+os.environ["PYTHONHASHSEED"] = str(0)
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+tf.config.experimental.enable_op_determinism()
+
+N_ITER = 10
+N_SOLUTIONS = 20
 FEATURE_SELECTION = True
 N_SPLITS = 5
 TEST_SIZE = 1
@@ -43,7 +48,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
-
 
 def configure_gpu():
     for gpu in tf.config.list_physical_devices("GPU"):
@@ -67,7 +71,8 @@ def load_dataset(filepath = None) :
     return df
 
 
-def get_feature_importance(df, features, target, sample_size=100):
+def get_feature_importance(df, features, target):
+    reset_seed()
     FEATURES_DIR.mkdir(parents=True, exist_ok=True)
     imp_file = FEATURES_DIR / f"{target}_feature_importance.csv"
 
@@ -80,7 +85,7 @@ def get_feature_importance(df, features, target, sample_size=100):
     state_importances = []
 
     for state, df_state in df.groupby("State"):
-        df_sample = df_state.iloc[-sample_size:] if sample_size and len(df_state) > sample_size else df_state
+        df_sample = df_state.iloc[:-24]
 
         logger.info(f"  Computing SHAP for state {state} (samples={len(df_sample)})...")
         baseline = MLPWrapper(
@@ -123,26 +128,26 @@ def build_optimizer(optimizer_name, common_kwargs, n_solutions):
     raise ValueError(f"Unknown optimizer {opt}")
 
 
-def optimize_seed(
-        df,
-        features,
-        target,
-        model_name,
-        model_wrapper,
-        optimizer_name,
-        bounds,
-        df_importance,
-        idx,
-        seed,
-        output_dir,
-        groupby
-):
+
+def run_optimization(df, features, target, model_name, model_wrapper, optimizer_name, bounds, df_importance):
+    output_dir = HYPERPARAMS_DIR / target / f"{model_name}_{optimizer_name.upper()}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    groupby = GROUPBY_COL if GROUPBY_COL in df.columns else None
+    summary_records = []
+
+    logger.info(
+        f"Starting: Target={target} | Model={model_name} | Opt={optimizer_name.upper()} | "
+        f"Seeds={len(SEEDS)} | Feature Selection={FEATURE_SELECTION}"
+    )
+
+    for idx, seed in enumerate(SEEDS, 1):
         logger.info(f"--- Seed {seed} ({idx}/{len(SEEDS)}) ---")
         reset_seed(seed)
         start_time = time.time()
 
         common_kwargs = dict(
-            dataset=df,
+            dataset=df.iloc[:-24],
             features=features,
             target=target,
             model_name=model_name,
@@ -152,6 +157,7 @@ def optimize_seed(
             path=output_dir,
             feature_selection=FEATURE_SELECTION,
             feature_importances=df_importance,
+            required_features=REQUIRED_FEATURES,
             n_splits=N_SPLITS,
             test_size=TEST_SIZE,
             groupby_col=groupby,
@@ -165,7 +171,7 @@ def optimize_seed(
         best_fitness = best_sol.get("fitness", best_cost)
         logger.info(f"Seed {seed} finished in {elapsed:.2f}s | Best Fitness: {best_fitness:.4f}")
 
-        return {
+        summary_records.append({
             "seed": seed,
             "target": target,
             "model": model_name,
@@ -173,75 +179,56 @@ def optimize_seed(
             "best_fitness": best_fitness,
             "elapsed_seconds": elapsed,
             **{k: v for k, v in best_sol.items() if k != "fitness"},
-        }
-
-def run_optimization(df, features, target, model_name, model_wrapper, optimizer_name, bounds, df_importance):
-    output_dir = HYPERPARAMS_DIR / target / f"{model_name}_{optimizer_name.upper()}"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    groupby = GROUPBY_COL if GROUPBY_COL in df.columns else None
-    summary_records = []
-
-    logger.info(
-        f"Starting: Target={target} | Model={model_name} | Opt={optimizer_name.upper()} | "
-        f"Seeds={len(SEEDS)} | Feature Selection={FEATURE_SELECTION}"
-    )
-    ctx = multiprocessing.get_context("spawn")
-    with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS, mp_context=ctx, initializer=configure_gpu) as executor:
-        future_to_seed = {
-            executor.submit(
-                optimize_seed,
-                df, features, target, model_name, model_wrapper,
-                optimizer_name, bounds, df_importance, idx, seed, output_dir, groupby,
-            ): seed
-            for idx, seed in enumerate(SEEDS, 1)
-        }
-
-        for future in concurrent.futures.as_completed(future_to_seed):
-            seed = future_to_seed[future]
-            try:
-                summary_records.append(future.result())
-            except Exception:
-                logger.exception(f"Seed {seed} failed:")
-
-    summary_records.sort(key=lambda r: r["seed"])
+        })
 
     summary_path = output_dir / f"summary_{model_name}_{optimizer_name.lower()}.csv"
     pd.DataFrame(summary_records).to_csv(summary_path, sep=";", decimal=".", index=False)
     logger.info(f"The results are stored in: {summary_path}")
 
 
+def optimize_target(target):
+    target_file = PROCESSED_DATA_DIR / f"dataset_final_{target.lower()}.csv"
+
+    df_target = load_dataset(target_file)
+    features_target = df_target.drop(columns=[target, "State"]).columns
+
+    df_importance = (
+        get_feature_importance(df_target, features_target, target)
+        if FEATURE_SELECTION
+        else None
+    )
+
+    models = get_models()
+    for model in models.keys():
+        model_name, model_wrapper, base_bounds = models[model]
+        bounds = base_bounds + [FEATURE_THRESHOLD_BOUND] if FEATURE_SELECTION else base_bounds
+
+        for opt_name in OPTIMIZERS:
+            run_optimization(
+                df=df_target,
+                features=features_target,
+                target=target,
+                model_name=model_name,
+                model_wrapper=model_wrapper,
+                optimizer_name=opt_name,
+                bounds=bounds,
+                df_importance=df_importance,
+            )
+
+
 def main():
     configure_gpu()
 
-    for target in TARGETS:
-        target_file = PROCESSED_DATA_DIR / f"dataset_final_{target.lower()}.csv"
+    with concurrent.futures.ProcessPoolExecutor(max_workers=len(TARGETS)) as executor:
+        futures = []
+        for target in TARGETS:
+            futures.append(executor.submit(optimize_target, target))
 
-        df_target = load_dataset(target_file)
-        features_target = df_target.drop(columns=[target, "State"]).columns
-
-        df_importance = (
-            get_feature_importance(df_target, features_target, target)
-            if FEATURE_SELECTION
-            else None
-        )
-
-        models = get_models()
-        for model in models.keys():
-            model_name, model_wrapper, base_bounds = models[model]
-            bounds = base_bounds + [FEATURE_THRESHOLD_BOUND] if FEATURE_SELECTION else base_bounds
-
-            for opt_name in OPTIMIZERS:
-                run_optimization(
-                    df=df_target,
-                    features=features_target,
-                    target=target,
-                    model_name=model_name,
-                    model_wrapper=model_wrapper,
-                    optimizer_name=opt_name,
-                    bounds=bounds,
-                    df_importance=df_importance,
-                )
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as exc:
+                print(f"Process generated an exception: {exc}")
 
 
 if __name__ == "__main__":
