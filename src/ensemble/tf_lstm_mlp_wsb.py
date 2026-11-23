@@ -1,20 +1,20 @@
-import tensorflow as tf
 import numpy as np
-from ensemble.tf_weaker_separator import TensorWSBagging
+import tensorflow as tf
 from tensorflow.keras.layers import Dense, Flatten, Input, Lambda, LSTM, Reshape
-from utils.constants import ACTIVATIONS, BATCH_SIZES
+
+from ensemble.tf_weaker_separator import TensorWSBagging
+from utils.constants import ACTIVATIONS
 
 
 class TensorLSTMMLPWSB(TensorWSBagging):
     def __init__(self,
-                 inputs,
-                 timesteps,
-                 lstm_units,
-                 lstm_activation,
-                 n_weak_mlps,
-                 max_mlp_hidden,
-                 epochs,
-                 batch_size,
+                 inputs=None,
+                 lstm_units=None,
+                 lstm_activation=None,
+                 n_weak_mlps=None,
+                 max_mlp_hidden=None,
+                 epochs=None,
+                 batch_size=32,
                  optimizer="adam",
                  loss="mse",
                  learning_rate=0.0005,
@@ -28,7 +28,6 @@ class TensorLSTMMLPWSB(TensorWSBagging):
 
         super().__init__(
             inputs=inputs,
-            timesteps=timesteps,
             epochs=epochs,
             batch_size=batch_size,
             optimizer=optimizer,
@@ -51,8 +50,9 @@ class TensorLSTMMLPWSB(TensorWSBagging):
 
     def _build_model(self):
         ensemble_input = Input(shape=(self._inputs,), name="ensemble_input")
-        reshaped_for_lstm = Reshape((self._timesteps, -1), name="reshape_lstm")(ensemble_input)
-        lstm_out = LSTM(self._lstm_units, activation=self._lstm_activation, use_bias=True, name='strong_lstm')(reshaped_for_lstm)
+        reshaped_for_lstm = Reshape((1, self._inputs), name="reshape_lstm")(ensemble_input)
+        lstm_out = LSTM(self._lstm_units, activation=self._lstm_activation, use_bias=True, name='strong_lstm')(
+            reshaped_for_lstm)
 
         strong_out = Dense(1, activation='linear', name='strong_pred')(lstm_out)
         weak_outputs = []
@@ -95,7 +95,6 @@ class TensorLSTMMLPWSB(TensorWSBagging):
     @classmethod
     def from_array(cls, solution_arr, **fixed_params):
         act_idx = int(np.clip(round(solution_arr[1]), 0, len(ACTIVATIONS) - 1))
-        bth_idx = int(np.clip(round(solution_arr[5]), 0, len(BATCH_SIZES) - 1))
 
         return cls(
             lstm_units=max(1, int(round(solution_arr[0]))),
@@ -103,11 +102,10 @@ class TensorLSTMMLPWSB(TensorWSBagging):
             n_weak_mlps=max(1, int(round(solution_arr[2]))),
             max_mlp_hidden=max(1, int(round(solution_arr[3]))),
             epochs=max(1, int(round(solution_arr[4]))),
-            batch_size=BATCH_SIZES[bth_idx],
-            learning_rate=float(solution_arr[6]),
-            strong_weight=float(solution_arr[7]),
-            weak_weight=float(1.0 - solution_arr[7]),
-            patches_ratio=float(solution_arr[8]),
+            learning_rate=float(solution_arr[5]),
+            strong_weight=float(solution_arr[6]),
+            weak_weight=float(1.0 - solution_arr[6]),
+            patches_ratio=float(solution_arr[7]),
             **fixed_params
         )
 
@@ -118,7 +116,6 @@ class TensorLSTMMLPWSB(TensorWSBagging):
             'n_weak_mlps': self._n_weak_mlps,
             'max_mlp_hidden': self._max_mlp_hidden,
             'epochs': self._epochs,
-            'batch_size': self._batch_size,
             'learning_rate': self._learning_rate,
             'strong_weight': float(self._strong_weight.numpy()),
             'weak_weight': float(self._weak_weight.numpy()),

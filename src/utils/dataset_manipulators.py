@@ -1,8 +1,7 @@
 import re
+
 import numpy as np
 import pandas as pd
-
-from utils.constants import CONSUMERS_VARS, CONSUMERS_SLUG
 
 
 def create_lags(dataset, lag_col, n_lags, groupby_col=None):

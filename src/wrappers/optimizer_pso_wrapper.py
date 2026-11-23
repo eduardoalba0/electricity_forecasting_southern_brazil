@@ -1,15 +1,13 @@
 import numpy as np
 from pyswarms.single import GlobalBestPSO
-from joblib import Parallel, delayed
 
-from utils.constants import N_JOBS
 from wrappers import OptimizerBaseWrapper
 
 
 class PSOWrapper(OptimizerBaseWrapper):
     def __init__(self, dataset, features, target, model_name, model_wrapper,
                  n_solutions, n_iter, bounds, path, feature_selection=False, feature_importances=None, required_features=None, fixed_params=None,
-                 options=None, n_splits=5, test_size=1, groupby_col=None, seed=42):
+                 options=None, n_splits=5, test_size=1, groupby_col=None, random_state=42):
 
         super().__init__(
             dataset=dataset,
@@ -27,7 +25,7 @@ class PSOWrapper(OptimizerBaseWrapper):
             n_splits=n_splits,
             test_size=test_size,
             groupby_col=groupby_col,
-            seed=seed
+            random_state=random_state
         )
 
         self._options = options if options is not None else {'c1': 2.0, 'c2': 1.5, 'w': 0.7}
@@ -52,8 +50,8 @@ class PSOWrapper(OptimizerBaseWrapper):
     def _run(self, parts):
         fit_lst = [self._run_objective_function(parts[j]) for j in range(self._n_solutions)]
 
-        self.solutions.sort(key=lambda s: s['fitness'])
-        self.iter.append(self.solutions[0])
+        self._solutions.sort(key=lambda s: s['fitness'])
+        self._iter.append(self._solutions[0])
         self._save_csv()
 
         return np.array(fit_lst)

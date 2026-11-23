@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from joblib import delayed, Parallel
@@ -9,12 +10,13 @@ from utils.constants import N_JOBS
 from utils.delayed_utils import eval_single_fold
 from utils.measures import rrmse
 
+
 class OptimizerBaseWrapper:
     def __init__(self, dataset, features, target, model_name, model_wrapper,
                  n_solutions, n_iter, path, feature_selection=False,
                  feature_importances=None, required_features=None,
                  fixed_params=None, n_splits=5, test_size=1,
-                 groupby_col=None, seed=42):
+                 groupby_col=None, random_state=42):
 
         if feature_selection and feature_importances is None:
             raise ValueError("feature_importances cannot be None when feature_selection is True.")
@@ -36,16 +38,16 @@ class OptimizerBaseWrapper:
             else None
         )
 
-        self.fixed_params = fixed_params if fixed_params is not None else {}
-        self.n_splits = n_splits
-        self.test_size = test_size
-        self.groupby_col = groupby_col
+        self._fixed_params = fixed_params if fixed_params is not None else {}
+        self._n_splits = n_splits
+        self._test_size = test_size
+        self._groupby_col = groupby_col
 
-        self.seed = seed
-        self.rng = np.random.default_rng(seed)
+        self._random_state = random_state
+        self._rng = np.random.default_rng(random_state)
 
-        self.solutions = []
-        self.iter = []
+        self._solutions = []
+        self._iter = []
         self._cache = {}
 
     def _build_optimizer(self):
@@ -68,31 +70,33 @@ class OptimizerBaseWrapper:
         return [col for col in self._features if col in selected]
 
     def _run_objective_function(self, solution_arr):
+        solution_arr = np.round(solution_arr, 4)
         if self._feature_selection:
             model_arr = solution_arr[:-1]
-            threshold = float(np.clip(solution_arr[-1], 0.0, 1.0))
+            threshold = round(float(np.clip(solution_arr[-1], 0.0, 1.0)), 4)
             features = self._select_features(threshold)
         else:
             model_arr = solution_arr
             threshold = None
             features = self._features
 
-        base_model = self._model_wrapper.from_array(model_arr, **self.fixed_params)
+        self._fixed_params["inputs"] = len(features)
+        base_model = self._model_wrapper.from_array(model_arr, **self._fixed_params)
         model_params = base_model.to_dict()
 
         key = build_cache_key(model_params, features)
         if key in self._cache:
             cached_solution = self._cache[key].copy()
             cached_solution["threshold"] = threshold
-            self.solutions.append(cached_solution)
+            self._solutions.append(cached_solution)
             return cached_solution["fitness"]
 
         csv_all = []
         dataset = self._dataset
 
         groups = (
-            dataset.groupby(self.groupby_col)
-            if self.groupby_col is not None
+            dataset.groupby(self._groupby_col)
+            if self._groupby_col is not None
             else [(None, dataset)]
         )
 
@@ -100,12 +104,12 @@ class OptimizerBaseWrapper:
             x = data[features]
             y = data[self._target]
 
-            tscv = TimeSeriesSplit(n_splits=self.n_splits, test_size=self.test_size)
+            tscv = TimeSeriesSplit(n_splits=self._n_splits, test_size=self._test_size)
             splits = list(tscv.split(data))
 
-            fold_results = Parallel(n_jobs=min(self.n_splits, N_JOBS), prefer="threads")(
+            fold_results = Parallel(n_jobs=min(self._n_splits, N_JOBS), prefer="threads")(
                 delayed(eval_single_fold)(
-                    self._model_wrapper, model_arr, self.fixed_params,
+                    self._model_wrapper, model_arr, self._fixed_params,
                     x.iloc[i_train], y.iloc[i_train],
                     x.iloc[i_test], y.iloc[i_test]
                 )
@@ -133,7 +137,7 @@ class OptimizerBaseWrapper:
             "features": list(features)
         }
         self._cache[key] = solution_record
-        self.solutions.append(solution_record.copy())
+        self._solutions.append(solution_record.copy())
         return fitness
 
     def _prepare_importances(self, df_imp):
@@ -149,6 +153,6 @@ class OptimizerBaseWrapper:
 
     def _save_csv(self):
         self._path.mkdir(parents=True, exist_ok=True)
-        df = pd.DataFrame(self.iter)
-        df.to_csv(self._path / f"{self._model_name} SEED {self.seed}.csv", sep=";", decimal=".", index=False)
+        df = pd.DataFrame(self._iter)
+        df.to_csv(self._path / f"{self._model_name} SEED {self._random_state}.csv", sep=";", decimal=".", index=False)
 

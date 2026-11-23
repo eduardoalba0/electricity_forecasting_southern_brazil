@@ -2,6 +2,7 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from typing import List, Tuple
+
 import pandas as pd
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -170,25 +171,21 @@ def main():
         consumer_col = f"{target} Consumers"
         target_lag_cols = [c for c in [target, consumer_col] if c in df_cleaned.columns]
 
-        df_target = create_lags(df_cleaned, lag_col=target_lag_cols, n_lags=12, groupby_col="State")
+        df_target_raw = create_lags(df_dataset, lag_col=target_lag_cols, n_lags=12, groupby_col="State")
+        df_target_clean = create_lags(df_cleaned, lag_col=target_lag_cols, n_lags=12, groupby_col="State")
 
         other_targets = [t for t in TARGETS if t != target]
         other_consumers = [c for c in CONSUMERS_VARS if c != consumer_col]
-        cols_to_drop = [c for c in other_targets + other_consumers + ["Month"] if c in df_target.columns]
-        df_target = df_target.drop(columns=cols_to_drop)
+        cols_to_drop = [c for c in other_targets + other_consumers + ["Month"] if c in df_target_raw.columns]
+
+        df_target_raw = df_target_raw.drop(columns=cols_to_drop)
+        df_target_clean = df_target_clean.drop(columns=cols_to_drop)
 
         target_output_path = os.path.join(PROCESSED_DATA_DIR, f"dataset_{target_slug}.csv")
         target_final_output_path = os.path.join(PROCESSED_DATA_DIR, f"dataset_final_{target_slug}.csv")
 
-        df_target.to_csv(target_output_path, index=True)
-        df_target.to_csv(target_final_output_path, index=True)
-        print(f"Dataset for {target} created with shape {df_target.shape} and saved to: {target_output_path}")
-
-    print(f"Dataset successfully created with shape: {df_dataset.shape}")
-    print(f"States included: {states_included}")
-    print(f"Date range: {date_range}")
-    print(f"Total features in base dataset: {len(df_dataset.columns)}")
-
+        df_target_raw.to_csv(target_output_path, index=True)
+        df_target_clean.to_csv(target_final_output_path, index=True)
 
 if __name__ == "__main__":
     main()

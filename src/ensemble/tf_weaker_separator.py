@@ -1,12 +1,10 @@
-from os import name
-
-import shap
 import numpy as np
 import pandas as pd
+import shap
 import tensorflow as tf
 from keras.src.layers import Concatenate
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import Add, Average, Lambda, Dense
+from tensorflow.keras.layers import Add, Average, Dense
 from tensorflow.keras.models import Model
 
 from utils.dataset_manipulators import recursive_predict
@@ -14,8 +12,7 @@ from utils.dataset_manipulators import recursive_predict
 
 class TensorWSBagging:
     def __init__(self,
-                 inputs,
-                 timesteps,
+                 inputs=None,
                  epochs=1,
                  batch_size=32,
                  optimizer='adam',
@@ -26,7 +23,7 @@ class TensorWSBagging:
                  random_patches=True,
                  patches_ratio=0.5,
                  early_stopping=5,
-                 auto_weights=False,
+                 auto_weights=True,
                  random_state=42):
 
         if not (0.0 < patches_ratio <= 1.0):
@@ -46,7 +43,6 @@ class TensorWSBagging:
         self._random_patches = random_patches
         self._patches_ratio = patches_ratio
         self._early_stopping = early_stopping
-        self._timesteps = timesteps
         self._auto_weights = auto_weights
 
         self._random_state = random_state
@@ -138,7 +134,7 @@ class TensorWSBagging:
             if x_arr.ndim == 1:
                 x_arr = x_arr.reshape(1, 1, -1)
             elif x_arr.ndim == 2:
-                x_arr = np.reshape(x_arr, (x_arr.shape[0], self._timesteps, -1))
+                x_arr = np.reshape(x_arr, (x_arr.shape[0], 1, -1))
         return self._model(x_arr, training=False).numpy().flatten()
 
     def get_importance(self, x, evaluation_split=0.2, normalize=True):

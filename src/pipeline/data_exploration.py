@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import pymannkendall as mk
 import seaborn as sns
-
 from matplotlib import pyplot as plt, ticker
 from scipy.stats import kruskal
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
@@ -12,6 +11,7 @@ from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.stattools import kpss
 
 from utils.constants import TARGETS, CONSUMERS_VARS
+
 
 def plot_targets(df, sufix):
     fig, ax = plt.subplots(figsize=(8, 5))

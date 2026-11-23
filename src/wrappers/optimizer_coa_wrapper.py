@@ -7,7 +7,7 @@ from wrappers import OptimizerBaseWrapper
 class COAWrapper(OptimizerBaseWrapper):
     def __init__(self, dataset, features, target, model_name, model_wrapper,
                  n_packs, n_coy, n_iter, bounds, path, feature_selection = False, feature_importances=None, required_features=None, fixed_params=None,
-                 n_splits=5, test_size=1, groupby_col=None, seed=42):
+                 n_splits=5, test_size=1, groupby_col=None, random_state=42):
 
         n_solutions = n_packs * n_coy
 
@@ -27,7 +27,7 @@ class COAWrapper(OptimizerBaseWrapper):
             n_splits=n_splits,
             test_size=test_size,
             groupby_col=groupby_col,
-            seed=seed
+            random_state=random_state
         )
 
         self._n_packs = n_packs
@@ -58,8 +58,8 @@ class COAWrapper(OptimizerBaseWrapper):
         fitness = self._run_objective_function(coyote)
         self._eval_count += 1
 
-        self.solutions.sort(key=lambda s: s['fitness'])
-        self.iter.append(self.solutions[0])
+        self._solutions.sort(key=lambda s: s['fitness'])
+        self._iter.append(self._solutions[0])
         self._save_csv()
 
         return fitness

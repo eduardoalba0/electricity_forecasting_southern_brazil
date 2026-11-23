@@ -3,6 +3,7 @@ import concurrent.futures
 from utils.constants import MAX_WORKERS
 from utils.copernicus_downloader import regions, process_cams_request, process_era5_region
 
+
 def main():
     with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []

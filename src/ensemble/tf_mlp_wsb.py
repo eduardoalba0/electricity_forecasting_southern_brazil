@@ -1,19 +1,20 @@
-import tensorflow as tf
 import numpy as np
-from ensemble.tf_weaker_separator import TensorWSBagging
+import tensorflow as tf
 from tensorflow.keras.layers import Dense, Flatten, Input, Lambda
-from utils.constants import ACTIVATIONS, BATCH_SIZES
+
+from ensemble.tf_weaker_separator import TensorWSBagging
+from utils.constants import ACTIVATIONS
 
 
 class TensorMLPWSB(TensorWSBagging):
     def __init__(self,
-                 inputs,
-                 mlp_strong_hidden,
-                 mlp_strong_activation,
-                 n_weak_mlps,
-                 max_mlp_hidden,
-                 epochs,
-                 batch_size,
+                 inputs=None,
+                 mlp_strong_hidden=None,
+                 mlp_strong_activation=None,
+                 n_weak_mlps=None,
+                 max_mlp_hidden=None,
+                 epochs=None,
+                 batch_size=None,
                  optimizer="adam",
                  loss="mse",
                  learning_rate=0.0005,
@@ -27,7 +28,6 @@ class TensorMLPWSB(TensorWSBagging):
 
         super().__init__(
             inputs=inputs,
-            timesteps=1,
             epochs=epochs,
             batch_size=batch_size,
             optimizer=optimizer,
@@ -85,7 +85,6 @@ class TensorMLPWSB(TensorWSBagging):
     @classmethod
     def from_array(cls, solution_arr, **fixed_params):
         act_idx = int(np.clip(round(solution_arr[1]), 0, len(ACTIVATIONS) - 1))
-        bth_idx = int(np.clip(round(solution_arr[5]), 0, len(BATCH_SIZES) - 1))
 
         return cls(
             mlp_strong_hidden=max(1, int(round(solution_arr[0]))),
@@ -93,11 +92,10 @@ class TensorMLPWSB(TensorWSBagging):
             n_weak_mlps=max(1, int(round(solution_arr[2]))),
             max_mlp_hidden=max(1, int(round(solution_arr[3]))),
             epochs=max(1, int(round(solution_arr[4]))),
-            batch_size=BATCH_SIZES[bth_idx],
-            learning_rate=float(solution_arr[6]),
-            strong_weight=float(solution_arr[7]),
-            weak_weight=float(1.0 - solution_arr[7]),
-            patches_ratio=float(solution_arr[8]),
+            learning_rate=float(solution_arr[5]),
+            strong_weight=float(solution_arr[6]),
+            weak_weight=float(1.0 - solution_arr[6]),
+            patches_ratio=float(solution_arr[7]),
             **fixed_params
         )
 
@@ -109,7 +107,6 @@ class TensorMLPWSB(TensorWSBagging):
             'n_weak_mlps': self._n_weak_mlps,
             'max_mlp_hidden': self._max_mlp_hidden,
             'epochs': self._epochs,
-            'batch_size': self._batch_size,
             'learning_rate': self._learning_rate,
             'strong_weight': float(self._strong_weight.numpy()),
             'weak_weight': float(self._weak_weight.numpy()),

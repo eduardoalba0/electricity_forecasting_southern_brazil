@@ -1,11 +1,11 @@
+import concurrent.futures
 import logging
 import multiprocessing
 import os
+import random
 import sys
 import time
 import warnings
-import random
-import concurrent.futures
 from pathlib import Path
 
 import numpy as np
@@ -34,12 +34,12 @@ def reset_seed(rnd_seed = 42):
 os.environ["PYTHONHASHSEED"] = str(0)
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-tf.config.experimental.enable_op_determinism()
+os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
 N_ITER = 10
 N_SOLUTIONS = 20
 FEATURE_SELECTION = True
-N_SPLITS = 5
+N_SPLITS = 12
 TEST_SIZE = 1
 GROUPBY_COL = "State"
 
@@ -54,6 +54,7 @@ def configure_gpu():
     for gpu in tf.config.list_physical_devices("GPU"):
         try:
             tf.config.experimental.set_memory_growth(gpu, True)
+            tf.config.experimental.enable_op_determinism()
         except RuntimeError:
             pass
 
@@ -93,7 +94,8 @@ def get_feature_importance(df, features, target):
             inputs=len(features),
             hidden_layers=100,
             epochs=50,
-            batch_size=128,
+            batch_size=32,
+            hidden_activation="relu"
         )
         baseline.fit(df_sample[features], df_sample[target])
         imp_state = baseline.get_importance(df_sample[features], evaluation_split=12, normalize=True)
@@ -131,7 +133,7 @@ def build_optimizer(optimizer_name, common_kwargs, n_solutions):
 
 
 def run_optimization(df, features, target, model_name, model_wrapper, optimizer_name, bounds, df_importance):
-    output_dir = HYPERPARAMS_DIR / target / f"{model_name}_{optimizer_name.upper()}"
+    output_dir = HYPERPARAMS_DIR / target / f"{optimizer_name.upper()}-{model_name}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     groupby = GROUPBY_COL if GROUPBY_COL in df.columns else None
@@ -148,7 +150,7 @@ def run_optimization(df, features, target, model_name, model_wrapper, optimizer_
         start_time = time.time()
 
         common_kwargs = dict(
-            dataset=df.iloc[:-24],
+            dataset=df,
             features=features,
             target=target,
             model_name=model_name,
@@ -162,18 +164,19 @@ def run_optimization(df, features, target, model_name, model_wrapper, optimizer_
             n_splits=N_SPLITS,
             test_size=TEST_SIZE,
             groupby_col=groupby,
-            seed=seed,
+            fixed_params={"random_state": seed, "batch_size": 32},
+            random_state=seed,
         )
         optimizer = build_optimizer(optimizer_name, common_kwargs, N_SOLUTIONS)
         best_cost, _ = optimizer.optimize()
         elapsed = time.time() - start_time
 
-        best_sol = optimizer.solutions[0] if optimizer.solutions else {}
+        best_sol = optimizer._solutions[0] if optimizer._solutions else {}
         best_fitness = best_sol.get("fitness", best_cost)
         logger.info(f"Seed {seed} finished in {elapsed:.2f}s | Best Fitness: {best_fitness:.4f}")
 
         summary_records.append({
-            "seed": seed,
+            "random_state": seed,
             "target": target,
             "model": model_name,
             "optimizer": optimizer_name.upper(),
@@ -187,7 +190,7 @@ def run_optimization(df, features, target, model_name, model_wrapper, optimizer_
     logger.info(f"The results are stored in: {summary_path}")
 
 
-def optimize_target(target):
+def optimize_target(target, model):
     configure_gpu()
     target_file = PROCESSED_DATA_DIR / f"dataset_final_{target.lower()}.csv"
 
@@ -200,36 +203,48 @@ def optimize_target(target):
         else None
     )
 
-    models = get_models()
-    for model in models.keys():
-        model_name, model_wrapper, base_bounds = models[model]
-        bounds = base_bounds + [FEATURE_THRESHOLD_BOUND] if FEATURE_SELECTION else base_bounds
+    groupby = GROUPBY_COL if GROUPBY_COL in df_target.columns else None
 
-        for opt_name in OPTIMIZERS:
-            run_optimization(
-                df=df_target,
-                features=features_target,
-                target=target,
-                model_name=model_name,
-                model_wrapper=model_wrapper,
-                optimizer_name=opt_name,
-                bounds=bounds,
-                df_importance=df_importance,
-            )
+    df_opt = (
+        df_target.groupby(GROUPBY_COL, group_keys=False).apply(lambda g: g.iloc[-108:-24])
+        if groupby
+        else df_target.iloc[-108:-24]
+    )
+
+    models = get_models()
+    model_name, model_wrapper, base_bounds = models[model]
+    bounds = base_bounds + [FEATURE_THRESHOLD_BOUND] if FEATURE_SELECTION else base_bounds
+
+    for opt_name in OPTIMIZERS:
+        run_optimization(
+            df=df_opt,
+            features=features_target,
+            target=target,
+            model_name=model_name,
+            model_wrapper=model_wrapper,
+            optimizer_name=opt_name,
+            bounds=bounds,
+            df_importance=df_importance,
+        )
 
 
 def main():
 
     multiprocessing.set_start_method("spawn", force=True)
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-        futures = [executor.submit(optimize_target, target) for target in TARGETS]
+    with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
+        future_to_task = {
+            executor.submit(optimize_target, target, model): (target, model)
+            for target in TARGETS
+            for model in get_models()
+        }
 
-        for future in concurrent.futures.as_completed(futures):
+        for future in concurrent.futures.as_completed(future_to_task):
+            target, model = future_to_task[future]
             try:
                 future.result()
             except Exception as exc:
-                print(f"Process generated an exception: {exc}")
+                logger.exception(f"Process for target '{target}' and model '{model}' generated an exception: {exc}")
 
 
 if __name__ == "__main__":
